@@ -144,7 +144,7 @@ Box.prototype.showAxes = function(fontSize) {
  
  // X AXIS LABEL
  this.ctx.fillStyle = '#333';
-this.ctx.font = (fontSize || this.data.dimension.w/100*3.5) + 'px Monospace';
+ this.ctx.font = (fontSize || this.data.dimension.w/100*3.5) + 'px Monospace';
  this.ctx.textAlign = "right";
  this.ctx.fillText(this.data.label.y, this.data.translate.x*this.data.zoom.x-this.data.dimension.w/100, this.data.translate.x*this.data.zoom.x);
 
@@ -158,6 +158,37 @@ this.ctx.font = (fontSize || this.data.dimension.w/100*3.5) + 'px Monospace';
  this.ctx.fillStyle = '#333';
  this.ctx.font = (fontSize || this.data.dimension.w/100*3.5) + 'px Monospace';
  this.ctx.fillText(this.data.label.x, this.data.dimension.w-(0+this.data.translate.x)*this.data.zoom.x, this.data.dimension.h-(0+this.data.translate.y)*this.data.zoom.y + this.data.dimension.w/100*3.5);
+ 
+ if (this.data.range.x.min > 0 || this.data.range.y.min > 0) {
+    
+   let s0 = 20;
+   let s1 = 30;
+   let c = {'x':s0, 'y':this.data.dimension.h - s0};
+
+   let o = this.PIXEL2VAL(c);
+   console.log(o);
+   console.log(this.data.range);
+   
+   let cx = {'x':s0+s1, 'y':this.data.dimension.h - s0};
+   let ox = this.PIXEL2VAL(cx);
+   
+   let cy = {'x':s0, 'y':this.data.dimension.h - (s0 + s1)};
+   
+    this.ctx.lineWidth = 1;
+    this.ctx.strokeStyle = '#333';
+    this.ctx.beginPath();
+    this.ctx.moveTo(cy.x, cy.y);
+    this.ctx.lineTo(c.x, c.y);
+    this.ctx.lineTo(cx.x, cx.y);
+    this.ctx.stroke();
+    
+    this.ctx.textAlign = 'start';
+    this.ctx.textBaseline = 'top';
+    this.ctx.fillText(this.data.label.x, c.x, c.y+2);
+    
+    
+ }
+ 
 }
 
 Box.prototype.SHOWVALUE = function(val, colorstring, rx) {
