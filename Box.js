@@ -131,6 +131,79 @@ Box.prototype.SHOWGRIDY = function(dy) {
 
 };
 
+Box.prototype.SHOW_FLOATING_LOG_Y_AXIS = function() {
+
+ let n = 9;
+ let sh = this.data.dimension.h/n;
+ let sw = 30;
+ 
+ let n1 = 2;
+ let n2 = n-n1;
+ 
+ let p0 = {'x':sw,'y':sh*n1};
+ let p1 = {'x':sw,'y':sh*n2};
+
+ let v0 = this.PIXEL2VAL(p0);
+ let v1 = this.PIXEL2VAL(p1);
+ 
+ this.CONNECTVALUES(v0, v1, '#333', 0.5);
+ 
+ let dsw = 5;
+ for (let i = n1; i <= n2; i++) {
+  let p0 = {'x':sw-dsw,'y':sh*i};
+  let p1 = {'x':sw+dsw,'y':sh*i};
+  let v0 = this.PIXEL2VAL(p0);
+  let v1 = this.PIXEL2VAL(p1);
+  this.ctx.fillStyle = '#333';
+  this.ctx.textAlign = 'left';
+  this.ctx.textBaseline = 'middle';
+  this.ctx.fillText((Math.E**v0.y).toFixed(2), p0.x+2*dsw, p0.y);
+  this.ctx.stroke();
+  this.CONNECTVALUES(v0, v1, '#333', 0.5); 
+ }
+ 
+ this.ctx.textAlign = 'center';
+ this.ctx.textBaseline = 'top';
+ this.ctx.fillText((this.data.label.y).toUpperCase(), sw, sh*(n2+0.25));
+};
+
+Box.prototype.SHOW_FLOATING_LOG_X_AXIS = function() {
+
+ let n = 9;
+ let sh = this.data.dimension.h - 30;
+ let sw = this.data.dimension.w/n;
+ 
+ let n1 = 2;
+ let n2 = n-n1;
+ 
+ let p0 = {'x':sw*n1,'y':sh};
+ let p1 = {'x':sw*n2,'y':sh};
+
+ let v0 = this.PIXEL2VAL(p0);
+ let v1 = this.PIXEL2VAL(p1);
+ 
+ this.CONNECTVALUES(v0, v1, '#333', 0.5);
+
+ let dsh = 5;
+ for (let i = n1; i <= n2; i++) {
+  let p0 = {'x':sw*i,'y':sh+dsh};
+  let p1 = {'x':sw*i,'y':sh-dsh};
+  let v0 = this.PIXEL2VAL(p0);
+  let v1 = this.PIXEL2VAL(p1);
+  this.ctx.fillStyle = '#333';
+  this.ctx.textAlign = 'center';
+  this.ctx.textBaseline = 'top';
+  this.ctx.fillText((Math.E**v0.y).toFixed(2), p0.x, p0.y+1*dsh);
+  this.ctx.stroke();
+  this.CONNECTVALUES(v0, v1, '#333', 0.5); 
+ }
+
+ this.ctx.textAlign = 'right';
+ this.ctx.textBaseline = 'middle';
+ this.ctx.fillText((this.data.label.x).toUpperCase(), sw*(n1-0.25), sh);
+
+};
+
 
 
 Box.prototype.showAxes = function(fontSize) {
