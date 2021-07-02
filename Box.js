@@ -18,16 +18,55 @@ function Box(label_x, label_y) {
     }
   },
   'label':{'x':label_x,'y':label_y}
+ };
+ 
+ this.maps = [
+  //['**','get',0.5],
+  //['/',23.5,['**','get',0.5]]
+ ]
+}
+
+Box.prototype.VAL2PIXEL = function(val) {  // val : (0,0) is bottom-left (Cartesian)
+ return {
+  'x':(val.x+this.data.translate.x)*this.data.zoom.x,
+  'y':this.data.dimension.h - (val.y+this.data.translate.y)*this.data.zoom.y
+ }
+}
+
+Box.prototype.PIXEL2VAL = function(pixel) { // pixel : (0,0) is top-left (standard computer/matrix grid)
+ return {
+  'x':(pixel.x/this.data.zoom.x)-this.data.translate.x,
+  'y':(this.data.dimension.h-pixel.y)/this.data.zoom.y-this.data.translate.y
  }
 }
 
 // centerOnValue(val) // takes the value, and places it in the center of the canvas, scaled so that it goes from (0,0) to (cx, cy)
 
-
+Box.prototype.recenter = function(val) {
+  let spanx = this.data.range.x.span;
+  let spany = this.data.range.y.span;
+  this.rangex(val.x-spanx/2, val.x+spanx/2);
+  this.rangey(val.y-spany/2, val.y+spany/2);
+  console.log(this);
+  // BUT I NEED TO RECALC EVERYTHING
+  //this.clear();
+  //this.SHOW_GRID_X(1);
+  //this.draw();
+}
 
 Box.prototype.returnCanvas = function() {
+
+ this.c.addEventListener('click', function(e) {
+  let pixel = {'x':e.offsetX,'y':e.offsetY};
+  let val = this.PIXEL2VAL(pixel);
+  //this.recenter(val);
+ }.bind(this)); // makes this.c inherit 'this' from Box
+ 
  return this.c;
 }
+
+
+
 
 Box.prototype.border = function(x) {
  this.c.style.border = x;
@@ -68,19 +107,7 @@ Box.prototype.rangey = function(min, max) {
  this.data.translate.y = -this.data.range.y.min;
 }
 
-Box.prototype.VAL2PIXEL = function(val) {
- return {
-  'x':(val.x+this.data.translate.x)*this.data.zoom.x,
-  'y':this.data.dimension.h - (val.y+this.data.translate.y)*this.data.zoom.y
- }
-}
 
-Box.prototype.PIXEL2VAL = function(pixel) {
- return {
-  'x':(pixel.x/this.data.zoom.x)-this.data.translate.x,
-  'y':(this.data.dimension.h-pixel.y)/this.data.zoom.y-this.data.translate.y
- }
-}
 
 Box.prototype.clear = function() {
  this.ctx.fillStyle = '#fff';
@@ -131,11 +158,39 @@ Box.prototype.SHOWGRIDY = function(dy) {
 
 };
 
+Box.prototype.SHOW_GRID_X = function(dx) {
+
+ if (!arguments[0]) {
+  dx = 1;
+ }
+ let zoom = this.data.zoom.x;
+
+ let alpha_1 = 1;
+ let alpha_10 = -1+(1/200)*zoom;
+ let color_string_1 = 'rgba(208, 208, 208,' + alpha_1 + ')';
+ let color_string_10 = 'rgba(224, 224, 224,' + alpha_10 + ')';
+ let x_start = Math.floor(this.data.range.x.min/dx)*dx;
+ 
+ let i = 0; // BC FLOATING PT NUMBERS MAKE TESTING x%dx TOUGH
+ for (let x = x_start; x < this.data.range.x.max; x += dx/10) {
+  if (i%10===0) {
+   let val0 = {'x':x,'y':this.data.range.y.min};
+   let val1 = {'x':x,'y':this.data.range.y.max};
+   this.CONNECTVALUES(val0, val1, color_string_1);
+  }
+
+  let val0 = {'x':x,'y':this.data.range.y.min};
+  let val1 = {'x':x,'y':this.data.range.y.max};
+  this.CONNECTVALUES(val0, val1, color_string_10);
+  i++;
+ }
+};
+
 Box.prototype.SHOW_FLOATING_LOG_Y_AXIS = function() {
 
  let n = 9;
  let sh = this.data.dimension.h/n;
- let sw = 30;
+ let sw = this.data.dimension.w/n;
  
  let n1 = 2;
  let n2 = n-n1;
@@ -170,7 +225,7 @@ Box.prototype.SHOW_FLOATING_LOG_Y_AXIS = function() {
 Box.prototype.SHOW_FLOATING_LOG_X_AXIS = function() {
 
  let n = 9;
- let sh = this.data.dimension.h - 30;
+ let sh = this.data.dimension.h - this.data.dimension.h/n;
  let sw = this.data.dimension.w/n;
  
  let n1 = 2;
@@ -193,7 +248,7 @@ Box.prototype.SHOW_FLOATING_LOG_X_AXIS = function() {
   this.ctx.fillStyle = '#333';
   this.ctx.textAlign = 'center';
   this.ctx.textBaseline = 'top';
-  this.ctx.fillText((Math.E**v0.y).toFixed(2), p0.x, p0.y+1*dsh);
+  this.ctx.fillText((Math.E**v0.x).toFixed(2), p0.x, p0.y+1*dsh);
   this.ctx.stroke();
   this.CONNECTVALUES(v0, v1, '#333', 0.5); 
  }
@@ -275,13 +330,13 @@ Box.prototype.SHOWVALUE = function(val, colorstring, rx) {
 
 }
 
-Box.prototype.CONNECTVALUES = function(val0, val1, colorstring, line_width) {
+Box.prototype.CONNECTVALUES = function(val0, val1, color_string, line_width) {
 
  let pixel0 = this.VAL2PIXEL(val0);
  let pixel1 = this.VAL2PIXEL(val1);
 
  this.ctx.lineWidth = (line_width || 1);
- this.ctx.strokeStyle = colorstring;
+ this.ctx.strokeStyle = color_string;
  this.ctx.beginPath();
  this.ctx.moveTo(pixel0.x, pixel0.y);
  this.ctx.lineTo(pixel1.x, pixel1.y);
@@ -309,4 +364,74 @@ Box.prototype.TEXT = function(str, val, color_string, font_size, font_family) {
  this.ctx.font = font_size + 'px ' + font_family;
  this.ctx.strokeStyle = (color_string || '#fff');
  this.ctx.fillText(str, pixel.x, pixel.y);
+}
+
+Box.prototype.draw = function() {
+  
+  this.maps.forEach(function(a, b, c) {
+
+    let arr = a;
+    //console.log(arr);
+      /*
+   // what is the operation?
+   let operation = (function() {
+     if (a[0] === 'get') {
+       return function(a) {
+         return a;
+       }
+     }
+     if (a[0] === '**') {
+       return function(a,b) {
+         return a**b;
+       }
+     }
+    if (a[0] === '+') {  /// its not arguments, i need arguments of 
+      return function(a,b) {
+        return a + b;
+      }
+    };
+    if (a[0] === '*') {
+      return function(a,b) {
+        return a*b;
+      }
+    };
+   })();
+   console.log(operation);
+   */
+   
+   for (let i = this.data.range.x.min; i < this.data.range.x.max; i++) {
+     let val = {'x':i,'y':abc(i,arr)};
+     this.SHOWVALUE(val, '#fc0', 2);
+   }
+  }.bind(this));
+
+}
+
+function abc(x, arr) {
+
+ if (arr[0] === 'get') {
+   if (arr[1] === 'x') {
+     return x;
+   } else {
+     return eval(arr[1]);        // why do ppl hate eval so much? why should i not use it?
+   }
+ }
+ if (arr%arr===0) {
+   return arr;
+ }
+ 
+ if (arr[0] === '**') {
+   return abc(x, arr[1])**abc(x, arr[2]);
+ }
+ 
+ if (arr[0] === '/') {
+   return abc(x, arr[1]) / abc(x, arr[2]);
+ }
+ if (arr[0] === '*') {
+   return abc(x, arr[1]) * abc(x, arr[2]);
+ }
+ if (arr[0] === '-') {
+   return abc(x, arr[1]) - abc(x, arr[2]);
+ }
+ 
 }
