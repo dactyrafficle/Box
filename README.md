@@ -21,7 +21,8 @@ draw little graphs
 // CONNECTVALUES = function(val0, val1, color_string, line_width)
 // CONNECTVALUES2 = function(arr, color_string, line_width)
 
-
+// for drawing a full line from one point and the slope
+// DRAW_LINE = function(val, slope, color_string, line_width) {
 
 /*
  obj = {
