@@ -15,7 +15,6 @@
 // box.SHOWVALUE({'x':5,'y':5}, '#fco', 2);
 
 
-
  
 function Box(label_x, label_y) {
  this.c = document.createElement('canvas');
@@ -80,7 +79,6 @@ Box.prototype.returnCanvas = function() {
  }.bind(this)); // makes this.c inherit 'this' from Box
  return this.c;
 }
-
 
 
 
@@ -449,13 +447,31 @@ Box.prototype.showAxes = function(fontSize) {
 Box.prototype.SHOWVALUE = function(val, colorstring, rx) {
 
  let pixel = this.VAL2PIXEL(val);
-
  this.ctx.fillStyle = colorstring;
  this.ctx.beginPath();
  this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
  this.ctx.fill();
 
 }
+
+
+
+Box.prototype.DRAW_LINE = function(val, slope, color_string, line_width) {
+
+  // console.log(val);
+  let val0 = {
+    'x':this.data.range.x.min,
+    'y':val.y - (val.x - this.data.range.x.min)*slope
+  };
+  // console.log(val0);
+  let val1 = {
+    'x':this.data.range.x.max,
+    'y':val0.y + this.data.range.x.span*slope
+  };
+  // console.log(val1);
+  this.CONNECTVALUES(val0, val1, color_string, line_width);
+}
+
 
 Box.prototype.CONNECTVALUES = function(val0, val1, color_string, line_width) {
 
