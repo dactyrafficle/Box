@@ -608,42 +608,94 @@ function abc(x, arr) {
  obj = {
   'alpha':alpha,
   'beta':beta,
-  'm',m,
+  'u':u,
   'x':x,
-  'y':y  
+  'y':y
+  'M',M,
+  'px':px,
+  'py':py,
+  'color_string':#000,
+  'line_width':1,
+  'inverted':false
  }
 */
-Box.prototype.DRAW_ISOQUANT = function(obj, color_string, line_width, inverted) {
- // if you have x, y, alpha, beta : you have utility to start with
- // equate the marshallian demands alpha*M/px with beta*M/py on M
- // y = x*px*beta/alpha
- // if you have x, y use U = x**alpha*y**beta
- 
- // this.CONNECTVALUES(v0, v1, '#333', 0.5);
- 
-  let a = obj.x**obj.alpha;
-  let b = obj.y**obj.beta;
-  let u = a*b;
-  let beta_inv = 1/obj.beta;
+Box.prototype.DRAW_ISOQUANT = function(obj) {
 
+  // must have alpha and beta
+  // and we must either have utility, or have what we need to make utility
+ 
+  // case 1 : u
+  // case 2 : u=f(x,y)
+  // case 3 : x=f(M,px) : y=f(M,py) : u=f(x,y)
+  
+  let alpha, alpha_inv, beta, beta_inv, u;
+
+  if (!obj.alpha || !obj.beta) {
+    console.log('you need alpha and beta');
+    return;
+  } else {
+    alpha = obj.alpha;
+    alpha_inv = 1/alpha;
+    beta = obj.beta;
+    beta_inv = 1/beta;
+  }
+
+  // FIRST CASE :
+  if (obj.u) {
+    u = obj.u;
+  }
+
+  // SECOND CASE : u = u(x, y)
+  if (!obj.u && (obj.x && obj.y)) {
+    let x = obj.x;
+    let y = obj.y;
+    u = x**alpha*y**beta;
+  }
+
+  // THIRD CASE : u = u(M, px, py)
+  let m, px, py;
+  if (!obj.u && (!obj.x && !obj.y) && (obj.M && obj.px && obj.py)) {
+    let M = obj.M;
+    let px = obj.px;
+    let py = obj.py;
+    let x = alpha*M/px;
+    let y = beta*M/py;
+    u = x**alpha*y**beta;
+  }
+  
+  
+  let string_color;
+  let line_width;
+  let inverted;
+  
+  if (!obj.string_color) {string_color = '#000'};
+  if (!obj.line_width) {line_width = 1};
+  if (!obj.inverted) {inverted = false};
+  
+  
   let dx = 0.5;
   let dy = 0.25;
-  let temp = {'x':this.data.range.x.min, 'y':(u/this.data.range.x.min**obj.alpha)**beta_inv};
+  
+  let temp = {
+    'x':this.data.range.x.min,
+    'y':(u/this.data.range.x.min**obj.alpha)**beta_inv
+  };
   
   for (x = this.data.range.x.min+dx; x < this.data.range.x.max+dx; x += dx) {
 
-    let y = (u/x**obj.alpha)**beta_inv;
+    let y = (u/x**alpha)**beta_inv;
     let val;
     
+    // TEST WHETHER WE SHOULD USE THE POINT
     if (Math.abs(y - temp.y) > dy) {
       
-      if (inverted) {
+      if (obj.inverted) {
         val = {'x':x, 'y':y};
-        this.CONNECTVALUES({'x':this.data.range.x.max-temp.x, 'y':this.data.range.y.max-temp.y}, {'x':this.data.range.x.max-x, 'y':this.data.range.y.max-y}, color_string, line_width);
+        this.CONNECTVALUES({'x':this.data.range.x.max-temp.x, 'y':this.data.range.y.max-temp.y}, {'x':this.data.range.x.max-x, 'y':this.data.range.y.max-y}, obj.color_string, obj.line_width);
         temp = val;
       } else {
         val = {'x':x, 'y': y};
-        this.CONNECTVALUES(temp, val, color_string, line_width);
+        this.CONNECTVALUES(temp, val, obj.color_string, obj.line_width);
         temp = val;
       }
     } 
@@ -651,33 +703,7 @@ Box.prototype.DRAW_ISOQUANT = function(obj, color_string, line_width, inverted) 
 
 
 
-/*
- for (x = this.data.range.x.min; x < this.data.range.x.max+dx; x += dx) {
 
-
-
-    // add all the points
-    let x0 = x;
-    let x1 = x+dx;
-    let y0 = (u/x0**obj.alpha)**beta_inv;
-    let y1 = (u/x1**obj.alpha)**beta_inv;
-    let val0 = {'x':x0, 'y': y0};
-    let val1 = {'x':x1, 'y': y1};
-  
-   if ((y0 >= this.data.range.y.min && y0 <= this.data.range.y.max) || (y1 >= this.data.range.y.min && y1 <= this.data.range.y.max)) {
-   
-    // AT LEAST ONE POINT WORKS
-    // let p = [val0, val1];
-    // console.log(p);
-    if (inverted) {
-      val0 = {'x':(this.data.range.x.max-x0), 'y':(this.data.range.y.max-y0)};
-      val1 = {'x':(this.data.range.x.max-x1), 'y':(this.data.range.y.max-y1)};
-    }
-    
-    this.CONNECTVALUES(val0, val1, color_string, line_width);
-   }
- }
-*/
 }
 
 
