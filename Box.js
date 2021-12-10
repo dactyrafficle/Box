@@ -14,34 +14,101 @@
 
 // box.SHOWVALUE({'x':5,'y':5}, '#fco', 2);
 
-
- 
-function Box(label_x, label_y) {
- this.c = document.createElement('canvas');
- this.ctx = this.c.getContext('2d');
- 
- this.data = {
-  'dimension':{'w':100,'h':100},
-  'zoom':{'x':1,'y':1},
-  'translate':{'x':0,'y':0},
-  'range':{
-    'x':{
-      'min':0,
-      'max':100
-    },
-    'y':{
-      'min':0,
-      'max':100
-    }
-  },
-  'label':{'x':label_x,'y':label_y}
- };
- 
- this.maps = [
-  //['**','get',0.5],
-  //['/',23.5,['**','get',0.5]]
- ]
+/*
+let obj = {
+  'labels':{
+    'x':null,
+    'y':null
+  }
 }
+*/
+function Box(obj) {
+
+  this.c = document.createElement('canvas');
+  this.ctx = this.c.getContext('2d');
+  
+  // STRUCTURE
+  this.data = {
+    'dimension':{
+      'w':100,
+      'h':100
+    },
+    'zoom':{
+      'x':0,
+      'y':0
+    },
+    'translate':{
+      'x':0,
+      'y':0
+    },
+    'range':{
+      'x':{
+        'min':0,
+        'max':0,
+        'span':0
+      },
+      'y':{
+        'min':0,
+        'max':0,
+        'span':0
+      }
+    }
+  };
+     
+  // DEFAULTS
+  if (!obj) {
+
+    this.RANGE_X(0, 100);
+    this.RANGE_Y(0, 100);
+    this.CANVAS_SIZE(300, 300);
+    this.c.style.border = '1px solid #999';
+
+  } else {
+    
+  }
+
+}
+
+Box.prototype.RETURN_CANVAS = function() {
+  this.c.addEventListener('click', function(e) {
+    let pixel = {'x':e.offsetX,'y':e.offsetY};
+    let val = this.PIXEL2VAL(pixel);
+  }.bind(this));
+  // makes is so that the 'this' skips a level, and refers to the parent and not the self
+  // 'this' in 'this.PIXEL2VAL(pixel)' would normally refer to 'this.c'
+  // but because of '.bind(this)' it now refers to the parent of 'this.c' which is object of RETURN_CANVAS, 'Box'
+ 
+  return this.c;
+}
+
+Box.prototype.RANGE_X = function(min, max) {
+ this.data.range.x.min = min;
+ this.data.range.x.max = max;
+ this.data.range.x.span = max-min;
+ this.data.zoom.x = this.data.dimension.w / this.data.range.x.span;
+ this.data.translate.x = -this.data.range.x.min;
+}
+
+Box.prototype.RANGE_Y = function(min, max) {
+ this.data.range.y.min = min;
+ this.data.range.y.max = max;
+ this.data.range.y.span = max-min;
+ this.data.zoom.y = this.data.dimension.h / this.data.range.y.span;
+ this.data.translate.y = -this.data.range.y.min;
+}
+
+Box.prototype.CANVAS_SIZE = function(w, h) {
+ this.data.dimension.w = w;
+ this.data.dimension.h = h; 
+ this.c.width = this.data.dimension.w;
+ this.c.height = this.data.dimension.h;
+ 
+ // RESET ZOOM AND XLATE BY REAPPLYING THE RANGES
+ this.RANGE_X(this.data.range.x.min, this.data.range.x.max);
+ this.RANGE_Y(this.data.range.y.min, this.data.range.y.max);
+}
+
+
 
 Box.prototype.VAL2PIXEL = function(val) {  // val : (0,0) is bottom-left (Cartesian)
  return {
@@ -80,14 +147,7 @@ Box.prototype.returnCanvas = function() {
  return this.c;
 }
 
-Box.prototype.RETURN_CANVAS = function() {
- this.c.addEventListener('click', function(e) {
-  let pixel = {'x':e.offsetX,'y':e.offsetY};
-  let val = this.PIXEL2VAL(pixel);
-  //this.recenter(val);
- }.bind(this)); // makes this.c inherit 'this' from Box
- return this.c;
-}
+
 
 Box.prototype.border = function(x) {
  this.c.style.border = x;
@@ -100,12 +160,7 @@ Box.prototype.dimension = function(w, h) {
  this.c.height = this.data.dimension.h;
 }
 
-Box.prototype.CANVAS_SIZE = function(w, h) {
- this.data.dimension.w = w;
- this.data.dimension.h = h; 
- this.c.width = this.data.dimension.w;
- this.c.height = this.data.dimension.h;
-}
+
 
 Box.prototype.zoom = function(zx, zy) {
  this.data.zoom.x = zx;
@@ -134,22 +189,7 @@ Box.prototype.rangey = function(min, max) {
  this.data.translate.y = -this.data.range.y.min;
 }
 
-Box.prototype.RANGE_X = function(min, max) {
- this.data.range.x.min = min;
- this.data.range.x.max = max;
- this.data.range.x.span = max-min;
 
- this.data.zoom.x = this.data.dimension.w / this.data.range.x.span;
- this.data.translate.x = -this.data.range.x.min;
-}
-Box.prototype.RANGE_Y = function(min, max) {
- this.data.range.y.min = min;
- this.data.range.y.max = max;
- this.data.range.y.span = max-min;
-
- this.data.zoom.y = this.data.dimension.h / this.data.range.y.span;
- this.data.translate.y = -this.data.range.y.min;
-}
 
 
 Box.prototype.CLEAR_CANVAS = function() {
@@ -158,6 +198,8 @@ Box.prototype.CLEAR_CANVAS = function() {
  this.ctx.rect(0, 0, this.data.dimension.w, this.data.dimension.h);
  this.ctx.fill();
 }
+
+
 Box.prototype.clear = function() {
  this.ctx.fillStyle = '#fff';
  this.ctx.beginPath();
@@ -207,7 +249,76 @@ Box.prototype.SHOWGRIDY = function(dy) {
 
 };
 
+/*
+  let obj = {
+    'dx':1,
+    'color_string':'#ddd',
+    'line_width':1
+  }
+*/
+Box.prototype.SHOW_GRID_X = function(obj) {
 
+  let dx = 10;
+  let color_string = '#ddd';
+  let line_width = 1;
+  
+  if (obj) {
+    if (obj.dx) {dx = obj.dx};
+    if (obj.color_string) {color_string = obj.color_string};
+    if (obj.line_width) {line_width = obj.line_width};
+  }
+  
+  let x_start = Math.floor(this.data.range.x.min/dx)*dx;
+ 
+  for (let x = x_start; x < this.data.range.x.max; x += dx) {
+
+    let val0 = {'x':x,'y':this.data.range.y.min};
+    let val1 = {'x':x,'y':this.data.range.y.max};
+
+    let pixel0 = this.VAL2PIXEL(val0);
+    let pixel1 = this.VAL2PIXEL(val1);
+
+    this.ctx.lineWidth = line_width;
+    this.ctx.strokeStyle = color_string;
+    this.ctx.fillStyle = color_string;
+    this.ctx.beginPath();
+    this.ctx.moveTo(pixel0.x, pixel0.y);
+    this.ctx.lineTo(pixel1.x, pixel1.y);
+    this.ctx.stroke();   
+  }
+};
+Box.prototype.SHOW_GRID_Y = function(obj) {
+
+  let dy = 10;
+  let color_string = '#ddd';
+  let line_width = 1;
+  
+  if (obj) {
+    if (obj.dy) {dy = obj.dy};
+    if (obj.color_string) {color_string = obj.color_string};
+    if (obj.line_width) {line_width = obj.line_width};
+  }
+  
+  let y_start = Math.floor(this.data.range.y.min/dy)*dy;
+ 
+  for (let y = y_start; y < this.data.range.y.max; y += dy) {
+
+    let val0 = {'x':this.data.range.x.min,'y':y};
+    let val1 = {'x':this.data.range.x.max,'y':y};
+
+    let pixel0 = this.VAL2PIXEL(val0);
+    let pixel1 = this.VAL2PIXEL(val1);
+
+    this.ctx.lineWidth = line_width;
+    this.ctx.strokeStyle = color_string;
+    this.ctx.fillStyle = color_string;
+    this.ctx.beginPath();
+    this.ctx.moveTo(pixel0.x, pixel0.y);
+    this.ctx.lineTo(pixel1.x, pixel1.y);
+    this.ctx.stroke();   
+  }
+};
+/*
 Box.prototype.SHOW_GRID_X = function(dx, color_string) {
 
  if (!arguments[0]) {
@@ -266,6 +377,7 @@ Box.prototype.SHOW_GRID_Y = function(dy, color_string) {
   i++;
  }
 };
+*/
 Box.prototype.SHOW_FLOATING_LOG_Y_AXIS = function(n) {
 
  let sh = this.data.dimension.h/n;
@@ -696,7 +808,7 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
   let line_width = 2;
   let rx = 4;
   
-  let colors = {
+  let line_color = {
     'marshallian':{
       'initial':{
         'x':'#ffe6b3', // CASE 0
@@ -719,49 +831,49 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
     }
   }
 
-  // LOCAL VARIABLES
 
-  let alpha_0, alpha_1;
-  let beta_0, beta_1;
-  let budget_0, budget_1;
-  let px_0, px_1;
-  let py_0, py_1;
+  // CORE PARAMETERS
 
-  alpha_0 = (obj.alpha) ? (obj.alpha[0]) : (null);
-  alpha_1 = (obj.alpha) ? (obj.alpha[1]) : (null);
+  let alpha_0 = (obj.alpha) ? (obj.alpha[0]) : (null); // BE CAREFUL WITH NULL, NULL**NULL = 1
+  let alpha_1 = (obj.alpha) ? (obj.alpha[1]) : (null);
   
-  beta_0 = (obj.beta) ? (obj.beta[0]) : (null);
-  beta_1 = (obj.beta) ? (obj.beta[1]) : (null);
+  let beta_0 = (obj.beta) ? (obj.beta[0]) : (null);
+  let beta_1 = (obj.beta) ? (obj.beta[1]) : (null);
   
-  budget_0 = (obj.budget) ? (obj.budget[0]) : (null);
-  budget_1 = (obj.budget) ? (obj.budget[1]) : (null);
+  let budget_0 = (obj.budget) ? (obj.budget[0]) : (null);
+  let budget_1 = (obj.budget) ? (obj.budget[1]) : (null);
 
-  px_0 = (obj.px) ? (obj.px[0]) : (null);
-  px_1 = (obj.px) ? (obj.px[1]) : (null);
+  let px_0 = (obj.px) ? (obj.px[0]) : (null);
+  let px_1 = (obj.px) ? (obj.px[1]) : (null);
   
-  py_0 = (obj.py) ? (obj.py[0]) : (null);
-  py_1 = (obj.py) ? (obj.py[1]) : (null);
+  let py_0 = (obj.py) ? (obj.py[0]) : (null);
+  let py_1 = (obj.py) ? (obj.py[1]) : (null);
+
 
   // THE RESULTING ALLOCATIONS
 
-  let x_0 = alpha_0 * budget_0 / px_0;
-  let y_0 = beta_0 * budget_0 / py_0;
-  let u_0 = x_0**alpha_0*y_0**beta_0;
+  // MARSHALLIAN
+  let x_0 = ((alpha_0 * budget_0 / px_0) || null); // BE CAREFUL WITH NULL, NULL**NULL = 1
+  let y_0 = ((beta_0 * budget_0 / py_0) || null);
+  let u_0 = (x_0 === null || y_0 === null) ? (null) : (x_0**alpha_0*y_0**beta_0);
 
-  let x_1 = alpha_1 * budget_1 / px_1;
-  let y_1 = beta_1 * budget_1 / py_1;
-  let u_1 = x_1**alpha_1*y_1**beta_1;
+  let x_1 = ((alpha_1 * budget_1 / px_1) || null);
+  let y_1 = ((beta_1 * budget_1 / py_1) || null);
+  let u_1 = (x_1 === null || y_1 === null) ? (null) : (x_1**alpha_1*y_1**beta_1);
   
+  // HICKSIAN; COMPENSATED
   let xc_0 = (u_0*(py_0/px_0*alpha_0/beta_0)**beta_0);
   let yc_0 = (u_0*(px_0/py_0*beta_0/alpha_0)**alpha_0);
   
-  let xc_1 = (u_0*(py_1/px_1*alpha_1/beta_1)**beta_1);
-  let yc_1 = (u_0*(px_1/py_1*beta_1/alpha_1)**alpha_1);
+  let xc_1 = (!(u_0*(py_1/px_1*alpha_1/beta_1)) || !beta_1) ? (null) : (u_0*(py_1/px_1*alpha_1/beta_1)**beta_1);
+  let yc_1 = (!(u_0*(px_1/py_1*beta_1/alpha_1)) || !alpha_1) ? (null) : (u_0*(px_1/py_1*beta_1/alpha_1)**alpha_1);
 
-
+  
   // PREP FOR LOOP
 
-  let dx = this.data.range.x.span/50;
+  let dx_pixel = 2; // if dx_pixel = 2, then we calculate x-y every 2nd pixel
+  let dx = dx_pixel * (this.data.range.x.span / this.data.dimension.w );
+  
   let temp = new Array(8);
   temp[0] = {'x':0,'y':alpha_0 * budget_0 / (dx/1000)};   // INITIAL MARSHALLIAN X
   temp[1] = {'x':0,'y':beta_0 * budget_0 / (dx/1000)};    // INITIAL MARSHALLIAN Y
@@ -775,8 +887,9 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
   temp[6] = {'x':0,'y':u_0*(py_1/(dx/1000)*alpha_1/beta_1)**beta_1}; // HICKSIAN RESPONSE X
   temp[7] = {'x':0,'y':u_0*(px_1/(dx/1000)*beta_1/alpha_1)**alpha_1}; // HICKSIAN RESPONSE Y
 
-  let initial_marshallian_x = (obj.x[0] && obj.marshallian) ? (true) : (false);
-  let initial_marshallian_y = (obj.y[0] && obj.marshallian) ? (true) : (false);
+  let initial_marshallian_x = (obj.x[0] && obj.marshallian);
+  let initial_marshallian_y = (obj.y[0] && obj.marshallian);
+
   let final_marshallian_x = (obj.x[1] && obj.marshallian) ? (true) : (false);
   let final_marshallian_y = (obj.y[1] && obj.marshallian) ? (true) : (false);
   
@@ -784,20 +897,20 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
   let initial_hicksian_y = (obj.y[0] && obj.hicksian) ? (true) : (false);
   let final_hicksian_x = (obj.x[1] && obj.hicksian) ? (true) : (false);
   let final_hicksian_y = (obj.y[1] && obj.hicksian) ? (true) : (false);
-  
+
+
   // DRAW IN LOOP
-  
   for (let x = dx; x < this.data.range.x.max+dx; x += dx) {
 
     // CASE 6 : FINAL HICKSIAN X
     if (obj.x[1] && obj.hicksian) {
       let y = u_0*(py_1/x*alpha_1/beta_1)**beta_1;
       let val = {'x':x,'y':y};
-      this.CONNECTVALUES(temp[6], val, colors.hicksian.final.x, line_width);
+      this.CONNECTVALUES(temp[6], val, line_color.hicksian.final.x, line_width);
       temp[6] = val;
       
       let pixel = this.VAL2PIXEL({'x':px_1,'y':xc_1});
-      this.ctx.fillStyle = colors.hicksian.final.x;
+      this.ctx.fillStyle = line_color.hicksian.final.x;
       this.ctx.beginPath();
       this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
       this.ctx.fill();
@@ -807,11 +920,11 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
     if (obj.y[1] && obj.hicksian) {
       let y = u_0*(px_1/x*beta_1/alpha_1)**alpha_1;
       let val = {'x':x,'y':y};
-      this.CONNECTVALUES(temp[7], val, colors.hicksian.final.y, line_width);
+      this.CONNECTVALUES(temp[7], val, line_color.hicksian.final.y, line_width);
       temp[7] = val;
       
       let pixel = this.VAL2PIXEL({'x':py_1,'y':yc_1});
-      this.ctx.fillStyle = colors.hicksian.final.y;
+      this.ctx.fillStyle = line_color.hicksian.final.y;
       this.ctx.beginPath();
       this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
       this.ctx.fill();
@@ -822,11 +935,11 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
     if (initial_hicksian_x) {
       let y = u_0*(py_0/x*alpha_0/beta_0)**beta_0;
       let val = {'x':x,'y':y};
-      this.CONNECTVALUES(temp[4], val, colors.hicksian.initial.x, line_width);
+      this.CONNECTVALUES(temp[4], val, line_color.hicksian.initial.x, line_width);
       temp[4] = val;
       
       let pixel = this.VAL2PIXEL({'x':px_0,'y':u_0*(py_0/px_0*alpha_0/beta_0)**beta_0});
-      this.ctx.fillStyle = colors.hicksian.initial.x;
+      this.ctx.fillStyle = line_color.hicksian.initial.x;
       this.ctx.beginPath();
       this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI); // THIS POINT WILL ACTUALLY NOT BE SEEN
       this.ctx.fill();
@@ -836,11 +949,11 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
     if (initial_hicksian_y) {
       let y = u_0*(px_0/x*beta_0/alpha_0)**alpha_0;
       let val = {'x':x,'y':y};
-      this.CONNECTVALUES(temp[5], val, colors.hicksian.initial.y, line_width);
+      this.CONNECTVALUES(temp[5], val, line_color.hicksian.initial.y, line_width);
       temp[5] = val;
       
       let pixel = this.VAL2PIXEL({'x':py_0,'y':u_0*(px_0/py_0*beta_0/alpha_0)**alpha_0});
-      this.ctx.fillStyle = colors.hicksian.initial.y;
+      this.ctx.fillStyle = line_color.hicksian.initial.y;
       this.ctx.beginPath();
       this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI); // THIS POINT WILL ACTUALLY NOT BE SEEN
       this.ctx.fill();
@@ -850,11 +963,11 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
     if (final_marshallian_y) {
       let y = beta_1 * budget_1 / x;
       let val = {'x':x,'y':y};
-      this.CONNECTVALUES(temp[3], val, colors.marshallian.final.y, line_width);
+      this.CONNECTVALUES(temp[3], val, line_color.marshallian.final.y, line_width);
       temp[3] = val;
       
       let pixel = this.VAL2PIXEL({'x':py_1,'y':(beta_1 * budget_1 / py_1)});
-      this.ctx.fillStyle = colors.marshallian.final.y;
+      this.ctx.fillStyle = line_color.marshallian.final.y;
       this.ctx.beginPath();
       this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
       this.ctx.fill();
@@ -864,11 +977,11 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
     if (final_marshallian_x) {
       let y = alpha_1 * budget_1 / x;
       let val = {'x':x,'y':y};
-      this.CONNECTVALUES(temp[2], val, colors.marshallian.final.x, line_width);
+      this.CONNECTVALUES(temp[2], val, line_color.marshallian.final.x, line_width);
       temp[2] = val;
       
       let pixel = this.VAL2PIXEL({'x':px_1,'y':(alpha_1 * budget_1 / px_1)});
-      this.ctx.fillStyle = colors.marshallian.final.x;
+      this.ctx.fillStyle = line_color.marshallian.final.x;
       this.ctx.beginPath();
       this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
       this.ctx.fill();
@@ -878,11 +991,11 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
     if (initial_marshallian_y) {
       let y = beta_0 * budget_0 / x;
       let val = {'x':x,'y':y};
-      this.CONNECTVALUES(temp[1], val, colors.marshallian.initial.y, line_width);
+      this.CONNECTVALUES(temp[1], val, line_color.marshallian.initial.y, line_width);
       temp[1] = val;
       
       let pixel = this.VAL2PIXEL({'x':py_0,'y':(beta_0 * budget_0 / py_0)});
-      this.ctx.fillStyle = colors.marshallian.initial.y;
+      this.ctx.fillStyle = line_color.marshallian.initial.y;
       this.ctx.beginPath();
       this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
       this.ctx.fill();
@@ -892,11 +1005,11 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
     if (initial_marshallian_x) {
       let y = alpha_0 * budget_0 / x;
       let val = {'x':x,'y':y};
-      this.CONNECTVALUES(temp[0], val, colors.marshallian.initial.x, line_width);
+      this.CONNECTVALUES(temp[0], val, line_color.marshallian.initial.x, line_width);
       temp[0] = val;
       
       let pixel = this.VAL2PIXEL({'x':px_0,'y':(alpha_0 * budget_0 / px_0)});
-      this.ctx.fillStyle = colors.marshallian.initial.x;
+      this.ctx.fillStyle = line_color.marshallian.initial.x;
       this.ctx.beginPath();
       this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
       this.ctx.fill();
@@ -906,14 +1019,12 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
 
   return {
     'initial':{
-      'u':u_0,
-      'marshallian':{'x':x_0,'y':y_0},
-      'hicksian':{'x':xc_0,'y':yc_0}
+      'marshallian':{'x':x_0,'y':y_0,'u':u_0},
+      'hicksian':{'x':xc_0,'y':yc_0,'u':u_0}
     },
     'final':{
-      'u':u_1,
-      'marshallian':{'x':x_1,'y':y_1},
-      'hicksian':{'x':xc_1,'y':yc_1}
+      'marshallian':{'x':x_1,'y':y_1,'u':u_1},
+      'hicksian':{'x':xc_1,'y':yc_1,'u':u_0}
     }
   };
   
