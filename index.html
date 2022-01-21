@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <link rel="stylesheet" href="a.css">
+  <link rel="icon" href="a.png">
+  <script src='Box.js'></script>
+
+</head>
+<body>
+
+<pre>
+
+let b = new Box();
+let c = b.RETURN_CANVAS();
+container.appendChild(c);
+
+b.CANVAS_SIZE(w, h);
+b.RANGE_X(min, max);
+b.RANGE_Y(min, max);
+
+b.ADD_CLICK();
+b.ADD_MOUSEMOVE();
+
+</pre>
+
+<pre>
+
+b.CLEAR_CANVAS();
+
+b.LINE_WIDTH(1);
+b.STROKE_STYLE('#ddd');
+b.SHOW_GRID_X();
+
+</pre>
+
+<pre>
+
+b.VAL2PIXEL();
+b.PIXEL2VAL();
+
+</pre>
+
+<div id='container'></div>
+
+</body>
+
+<script>
+
+let b = new Box();
+let c = b.RETURN_CANVAS();
+container.appendChild(c);
+ 
+b.CANVAS_SIZE(500, 500);    // this is the number of pixels
+b.RANGE_X(-1, 11);        // set the range in x
+b.RANGE_Y(-1, 11);       // set the range in y 
+
+b.ADD_CLICK();
+b.ADD_MOUSEMOVE();
+
+b.CLEAR_CANVAS();
+
+b.LINE_WIDTH(1);
+b.STROKE_STYLE('#ddd');
+b.SHOW_GRID_X();
+
+</script>
+</html>

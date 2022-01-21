@@ -14,15 +14,9 @@
 
 // box.SHOWVALUE({'x':5,'y':5}, '#fco', 2);
 
-/*
-let obj = {
-  'labels':{
-    'x':null,
-    'y':null
-  }
-}
-*/
-function Box(obj) {
+
+
+function Box() {
 
   this.c = document.createElement('canvas');
   this.ctx = this.c.getContext('2d');
@@ -54,27 +48,46 @@ function Box(obj) {
       }
     }
   };
+
+  this.current = {
+    'click':null,
+    'mousemove':null
+  }
      
   // DEFAULTS
   this.RANGE_X(0, 100);
   this.RANGE_Y(0, 100);
-  this.CANVAS_SIZE(300, 300);
-  this.c.style.border = '1px solid #999';
+  this.CANVAS_SIZE(100, 100);
 
-
+  this.c.style.border = '1px solid #ddd';
 
 }
 
 Box.prototype.RETURN_CANVAS = function() {
+  return this.c;
+}
+
+Box.prototype.CLEAR_CANVAS = function() {
+ this.ctx.fillStyle = '#fff';
+ this.ctx.beginPath();
+ this.ctx.rect(0, 0, this.data.dimension.w, this.data.dimension.h);
+ this.ctx.fill();
+}
+
+Box.prototype.ADD_CLICK = function() {
   this.c.addEventListener('click', function(e) {
     let pixel = {'x':e.offsetX,'y':e.offsetY};
     let val = this.PIXEL2VAL(pixel);
+    this.current.click = val;
   }.bind(this));
-  // makes is so that the 'this' skips a level, and refers to the parent and not the self
-  // 'this' in 'this.PIXEL2VAL(pixel)' would normally refer to 'this.c'
-  // but because of '.bind(this)' it now refers to the parent of 'this.c' which is object of RETURN_CANVAS, 'Box'
- 
-  return this.c;
+}
+
+Box.prototype.ADD_MOUSEMOVE = function() {
+  this.c.addEventListener('mousemove', function(e) {
+    let pixel = {'x':e.offsetX,'y':e.offsetY};
+    let val = this.PIXEL2VAL(pixel);
+    this.current.mousemove = val;
+  }.bind(this));
 }
 
 Box.prototype.RANGE_X = function(min, max) {
@@ -106,6 +119,12 @@ Box.prototype.CANVAS_SIZE = function(w, h) {
 
 
 
+
+
+
+
+/*** ***/
+
 Box.prototype.VAL2PIXEL = function(val) {  // val : (0,0) is bottom-left (Cartesian)
  return {
   'x':(val.x+this.data.translate.x)*this.data.zoom.x,
@@ -120,130 +139,18 @@ Box.prototype.PIXEL2VAL = function(pixel) { // pixel : (0,0) is top-left (standa
  }
 }
 
-// centerOnValue(val) // takes the value, and places it in the center of the canvas, scaled so that it goes from (0,0) to (cx, cy)
-
-Box.prototype.recenter = function(val) {
-  let spanx = this.data.range.x.span;
-  let spany = this.data.range.y.span;
-  this.rangex(val.x-spanx/2, val.x+spanx/2);
-  this.rangey(val.y-spany/2, val.y+spany/2);
-  //console.log(this);
-  // BUT I NEED TO RECALC EVERYTHING
-  //this.clear();
-  //this.SHOW_GRID_X(1);
-  //this.draw();
+Box.prototype.STROKE_STYLE = function(x) {
+  this.ctx.strokeStyle = x; 
 }
 
-Box.prototype.returnCanvas = function() {
- this.c.addEventListener('click', function(e) {
-  let pixel = {'x':e.offsetX,'y':e.offsetY};
-  let val = this.PIXEL2VAL(pixel);
-  //this.recenter(val);
- }.bind(this)); // makes this.c inherit 'this' from Box
- return this.c;
+Box.prototype.FILL_STYLE = function(x) {
+  this.ctx.fillStyle = x; 
 }
 
-
-
-Box.prototype.border = function(x) {
- this.c.style.border = x;
+Box.prototype.LINE_WIDTH = function(x) {
+  this.ctx.lineWidth = x; 
 }
 
-Box.prototype.dimension = function(w, h) {
- this.data.dimension.w = w;
- this.data.dimension.h = h; 
- this.c.width = this.data.dimension.w;
- this.c.height = this.data.dimension.h;
-}
-
-
-
-Box.prototype.zoom = function(zx, zy) {
- this.data.zoom.x = zx;
- this.data.zoom.y = zy;
-}
-
-Box.prototype.translate = function(x, y) {
- this.data.translate.x = x;
- this.data.translate.y = y; 
-}
-
-Box.prototype.rangex = function(min, max) {
- this.data.range.x.min = min;
- this.data.range.x.max = max;
- this.data.range.x.span = max-min;
-
- this.data.zoom.x = this.data.dimension.w / this.data.range.x.span;
- this.data.translate.x = -this.data.range.x.min;
-}
-Box.prototype.rangey = function(min, max) {
- this.data.range.y.min = min;
- this.data.range.y.max = max;
- this.data.range.y.span = max-min;
-
- this.data.zoom.y = this.data.dimension.h / this.data.range.y.span;
- this.data.translate.y = -this.data.range.y.min;
-}
-
-
-
-
-Box.prototype.CLEAR_CANVAS = function() {
- this.ctx.fillStyle = '#fff';
- this.ctx.beginPath();
- this.ctx.rect(0, 0, this.data.dimension.w, this.data.dimension.h);
- this.ctx.fill();
-}
-
-
-Box.prototype.clear = function() {
- this.ctx.fillStyle = '#fff';
- this.ctx.beginPath();
- this.ctx.rect(0, 0, this.data.dimension.w, this.data.dimension.h);
- this.ctx.fill();
-}
-
-Box.prototype.SHOWGRIDX = function(dx) {
-
- if (!arguments[0]) {
-   dx = 50* this.data.range.x.span / this.data.dimension.w; // default is 25 px
- }
-
- for (let x = -dx; x > this.data.range.x.min; x -= dx) {
-   let val0 = {'x':x,'y':this.data.range.y.min};
-   let val1 = {'x':x,'y':this.data.range.y.max};
-   this.CONNECTVALUES(val0, val1, '#ddd');
- }
-
- for (let x = 0; x < this.data.range.x.max; x += dx) {
-   let val0 = {'x':x,'y':this.data.range.y.min};
-   let val1 = {'x':x,'y':this.data.range.y.max};
-   this.CONNECTVALUES(val0, val1, '#ddd');
- }
-
-
-};
-
-Box.prototype.SHOWGRIDY = function(dy) {
-
- if (!arguments[0]) {
-   dy = 50* this.data.range.y.span / this.data.dimension.h; // default is 25 px
- }
-
- for (let y = -dy; y > this.data.range.y.min; y -= dy) {
-   let val0 = {'x':this.data.range.x.min,'y':y};
-   let val1 = {'x':this.data.range.x.max,'y':y};
-   this.CONNECTVALUES(val0, val1, '#ddd');
- }
-
- for (let y = 0; y < this.data.range.y.max; y += dy) {
-   let val0 = {'x':this.data.range.x.min,'y':y};
-   let val1 = {'x':this.data.range.x.max,'y':y};
-   this.CONNECTVALUES(val0, val1, '#ddd');
- }
-
-
-};
 
 /*
   let obj = {
@@ -252,20 +159,11 @@ Box.prototype.SHOWGRIDY = function(dy) {
     'line_width':1
   }
 */
-Box.prototype.SHOW_GRID_X = function(obj) {
+Box.prototype.SHOW_GRID_X = function() {
 
-  let dx = 10;
-  let color_string = '#ddd';
-  let line_width = 1;
-  
-  if (obj) {
-    if (obj.dx) {dx = obj.dx};
-    if (obj.color_string) {color_string = obj.color_string};
-    if (obj.line_width) {line_width = obj.line_width};
-  }
-  
+  let dx = 1;
   let x_start = Math.floor(this.data.range.x.min/dx)*dx;
- 
+
   for (let x = x_start; x < this.data.range.x.max; x += dx) {
 
     let val0 = {'x':x,'y':this.data.range.y.min};
@@ -273,16 +171,16 @@ Box.prototype.SHOW_GRID_X = function(obj) {
 
     let pixel0 = this.VAL2PIXEL(val0);
     let pixel1 = this.VAL2PIXEL(val1);
-
-    this.ctx.lineWidth = line_width;
-    this.ctx.strokeStyle = color_string;
-    this.ctx.fillStyle = color_string;
+    
     this.ctx.beginPath();
     this.ctx.moveTo(pixel0.x, pixel0.y);
     this.ctx.lineTo(pixel1.x, pixel1.y);
     this.ctx.stroke();   
   }
 };
+
+
+
 Box.prototype.SHOW_GRID_Y = function(obj) {
 
   let dy = 10;
@@ -314,6 +212,8 @@ Box.prototype.SHOW_GRID_Y = function(obj) {
     this.ctx.stroke();   
   }
 };
+
+
 /*
 Box.prototype.SHOW_GRID_X = function(dx, color_string) {
 
