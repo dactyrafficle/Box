@@ -2,6 +2,7 @@
 <html>
 <head>
 
+  <title>THIS</title>
   <link rel="stylesheet" href="a.css">
   <link rel="icon" href="a.png">
   <script src='Box.js'></script>
@@ -9,60 +10,87 @@
 </head>
 <body>
 
-<pre>
+<div class='section'>
 
+<div class='box'>
+
+<pre>
 let b = new Box();
 let c = b.RETURN_CANVAS();
 container.appendChild(c);
 
-b.CANVAS_SIZE(w, h);
-b.RANGE_X(min, max);
-b.RANGE_Y(min, max);
+b.CANVAS_SIZE(500, 500);    <span class='comment'> // this is the number of pixels </span>
+b.RANGE_X(-1, 11);          <span class='comment'> // set the range in x </span>
+b.RANGE_Y(-1, 11);          <span class='comment'> // set the range in y </span>
 
-b.ADD_CLICK();
-b.ADD_MOUSEMOVE();
-
-</pre>
-
-<pre>
+b.ADD_CLICK();      <span class='comment'> // updates b.current.click.value and .pixel </span>
+b.ADD_MOUSEMOVE();  <span class='comment'> // updates b.current.mousemove.value and .pixel </span>
 
 b.CLEAR_CANVAS();
 
+<span class='comment'>// DRAW AN X-Y GRID </span>
 b.LINE_WIDTH(1);
 b.STROKE_STYLE('#ddd');
 b.SHOW_GRID_X();
+b.SHOW_GRID_Y();
 
+<span class='comment'>// DRAW A POINT </span>
+b.FILL_STYLE('#fc0a');
+b.SHOW_VALUE({
+  'val':{'x':5,'y':5},
+  'rx':3
+});
+  
 </pre>
 
 <pre>
 
-b.VAL2PIXEL();
-b.PIXEL2VAL();
+b.VALUE2PIXEL();
+b.PIXEL2VALUE();
 
 </pre>
 
-<div id='container'></div>
+</div>
+
+<div class='box' id='container'></div>
+
+</div>
 
 </body>
 
 <script>
 
-let b = new Box();
-let c = b.RETURN_CANVAS();
-container.appendChild(c);
- 
-b.CANVAS_SIZE(500, 500);    // this is the number of pixels
-b.RANGE_X(-1, 11);        // set the range in x
-b.RANGE_Y(-1, 11);       // set the range in y 
+let b, c;
 
-b.ADD_CLICK();
-b.ADD_MOUSEMOVE();
+window.onload = function() {
 
-b.CLEAR_CANVAS();
+  b = new Box();
+  c = b.RETURN_CANVAS();
+  container.appendChild(c);
+  
+  b.CANVAS_SIZE(500, 500);    // this is the number of pixels
+  b.RANGE_X(-1, 11);          // set the range in x
+  b.RANGE_Y(-1, 11);          // set the range in y 
 
-b.LINE_WIDTH(1);
-b.STROKE_STYLE('#ddd');
-b.SHOW_GRID_X();
+  b.ADD_CLICK();
+  b.ADD_MOUSEMOVE();
+
+  b.CLEAR_CANVAS();
+
+  b.LINE_WIDTH(1);
+  b.STROKE_STYLE('#ddd');
+  b.SHOW_GRID_X();
+  b.SHOW_GRID_Y();
+  
+  b.FILL_STYLE('#fc0a');
+  b.SHOW_VALUE({
+    'val':{'x':5,'y':5},
+    'rx':3
+  });
+
+}
+
+
 
 </script>
 </html>

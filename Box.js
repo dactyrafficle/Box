@@ -1,20 +1,18 @@
 
-// let box = new Box();
-// let c = box.returnCanvas();
-// container.appendChild(c);  // append it to a container div element or sthing
+/*
 
-// box.dimension(500, 500); // this is the number of pixels
+let b = new Box();
+let c = b.RETURN_CANVAS();
+container.appendChild(c);
 
-// you may need to reset these on some other condition
-// box.rangex(5, 50); // set the range in x
-// box.rangey(3, 130); // set the range in y 
+b.CANVAS_SIZE(500, 500);     // this is the number of pixels 
+b.RANGE_X(-1, 11);           // set the range in x 
+b.RANGE_Y(-1, 11);           // set the range in y 
 
+b.ADD_CLICK();       // updates b.current.click.value and .pixel 
+b.ADD_MOUSEMOVE();   // updates b.current.mousemove.value and .pixel 
 
-// box.SHOWGRIDY(5);
-
-// box.SHOWVALUE({'x':5,'y':5}, '#fco', 2);
-
-
+*/
 
 function Box() {
 
@@ -50,8 +48,14 @@ function Box() {
   };
 
   this.current = {
-    'click':null,
-    'mousemove':null
+    'click':{
+      'value':null,
+      'pixel':null
+    },
+    'mousemove':{
+      'value':null,
+      'pixel':null
+    }
   }
      
   // DEFAULTS
@@ -59,7 +63,7 @@ function Box() {
   this.RANGE_Y(0, 100);
   this.CANVAS_SIZE(100, 100);
 
-  this.c.style.border = '1px solid #ddd';
+  // this.c.style.border = '1px solid #ddd';
 
 }
 
@@ -68,71 +72,65 @@ Box.prototype.RETURN_CANVAS = function() {
 }
 
 Box.prototype.CLEAR_CANVAS = function() {
- this.ctx.fillStyle = '#fff';
- this.ctx.beginPath();
- this.ctx.rect(0, 0, this.data.dimension.w, this.data.dimension.h);
- this.ctx.fill();
+  this.ctx.fillStyle = '#fff';
+  this.ctx.beginPath();
+  this.ctx.rect(0, 0, this.data.dimension.w, this.data.dimension.h);
+  this.ctx.fill();
 }
 
 Box.prototype.ADD_CLICK = function() {
   this.c.addEventListener('click', function(e) {
     let pixel = {'x':e.offsetX,'y':e.offsetY};
-    let val = this.PIXEL2VAL(pixel);
-    this.current.click = val;
+    let value = this.PIXEL2VALUE(pixel);
+    this.current.click.value = value;
+    this.current.click.pixel = pixel;
   }.bind(this));
 }
 
 Box.prototype.ADD_MOUSEMOVE = function() {
   this.c.addEventListener('mousemove', function(e) {
     let pixel = {'x':e.offsetX,'y':e.offsetY};
-    let val = this.PIXEL2VAL(pixel);
-    this.current.mousemove = val;
+    let value = this.PIXEL2VALUE(pixel);
+    this.current.mousemove.value = value;
+    this.current.mousemove.pixel = pixel;
   }.bind(this));
 }
 
 Box.prototype.RANGE_X = function(min, max) {
- this.data.range.x.min = min;
- this.data.range.x.max = max;
- this.data.range.x.span = max-min;
- this.data.zoom.x = this.data.dimension.w / this.data.range.x.span;
- this.data.translate.x = -this.data.range.x.min;
+  this.data.range.x.min = min;
+  this.data.range.x.max = max;
+  this.data.range.x.span = max-min;
+  this.data.zoom.x = this.data.dimension.w / this.data.range.x.span;
+  this.data.translate.x = -this.data.range.x.min;
 }
 
 Box.prototype.RANGE_Y = function(min, max) {
- this.data.range.y.min = min;
- this.data.range.y.max = max;
- this.data.range.y.span = max-min;
- this.data.zoom.y = this.data.dimension.h / this.data.range.y.span;
- this.data.translate.y = -this.data.range.y.min;
+  this.data.range.y.min = min;
+  this.data.range.y.max = max;
+  this.data.range.y.span = max-min;
+  this.data.zoom.y = this.data.dimension.h / this.data.range.y.span;
+  this.data.translate.y = -this.data.range.y.min;
 }
 
 Box.prototype.CANVAS_SIZE = function(w, h) {
- this.data.dimension.w = w;
- this.data.dimension.h = h; 
- this.c.width = this.data.dimension.w;
- this.c.height = this.data.dimension.h;
+  this.data.dimension.w = w;
+  this.data.dimension.h = h; 
+  this.c.width = this.data.dimension.w;
+  this.c.height = this.data.dimension.h;
  
- // RESET ZOOM AND XLATE BY REAPPLYING THE RANGES
- this.RANGE_X(this.data.range.x.min, this.data.range.x.max);
- this.RANGE_Y(this.data.range.y.min, this.data.range.y.max);
+  // RESET ZOOM AND XLATE BY REAPPLYING THE RANGES
+  this.RANGE_X(this.data.range.x.min, this.data.range.x.max);
+  this.RANGE_Y(this.data.range.y.min, this.data.range.y.max);
 }
 
-
-
-
-
-
-
-/*** ***/
-
-Box.prototype.VAL2PIXEL = function(val) {  // val : (0,0) is bottom-left (Cartesian)
+Box.prototype.VALUE2PIXEL = function(val) {  // val : (0,0) is bottom-left (Cartesian)
  return {
   'x':(val.x+this.data.translate.x)*this.data.zoom.x,
   'y':this.data.dimension.h - (val.y+this.data.translate.y)*this.data.zoom.y
  }
 }
 
-Box.prototype.PIXEL2VAL = function(pixel) { // pixel : (0,0) is top-left (standard computer/matrix grid)
+Box.prototype.PIXEL2VALUE = function(pixel) { // pixel : (0,0) is top-left (standard computer/matrix grid)
  return {
   'x':(pixel.x/this.data.zoom.x)-this.data.translate.x,
   'y':(this.data.dimension.h-pixel.y)/this.data.zoom.y-this.data.translate.y
@@ -151,99 +149,69 @@ Box.prototype.LINE_WIDTH = function(x) {
   this.ctx.lineWidth = x; 
 }
 
-
-/*
-  let obj = {
-    'dx':1,
-    'color_string':'#ddd',
-    'line_width':1
-  }
-*/
 Box.prototype.SHOW_GRID_X = function() {
 
   let dx = 1;
   let x_start = Math.floor(this.data.range.x.min/dx)*dx;
+  
+  let y0 = this.data.range.y.min;
+  let y1 = this.data.range.y.max;
 
-  for (let x = x_start; x < this.data.range.x.max; x += dx) {
+  for (let x = x_start; x <= this.data.range.x.max; x += dx) {
 
-    let val0 = {'x':x,'y':this.data.range.y.min};
-    let val1 = {'x':x,'y':this.data.range.y.max};
+    let v0 = {'x':x,'y':y0};
+    let v1 = {'x':x,'y':y1};
 
-    let pixel0 = this.VAL2PIXEL(val0);
-    let pixel1 = this.VAL2PIXEL(val1);
+    let p0 = this.VALUE2PIXEL(v0);
+    let p1 = this.VALUE2PIXEL(v1);
     
     this.ctx.beginPath();
-    this.ctx.moveTo(pixel0.x, pixel0.y);
-    this.ctx.lineTo(pixel1.x, pixel1.y);
+    this.ctx.moveTo(p0.x, p0.y);
+    this.ctx.lineTo(p1.x, p1.y);
     this.ctx.stroke();   
   }
 };
 
 
+Box.prototype.SHOW_GRID_Y = function() {
 
-Box.prototype.SHOW_GRID_Y = function(obj) {
-
-  let dy = 10;
-  let color_string = '#ddd';
-  let line_width = 1;
-  
-  if (obj) {
-    if (obj.dy) {dy = obj.dy};
-    if (obj.color_string) {color_string = obj.color_string};
-    if (obj.line_width) {line_width = obj.line_width};
-  }
-  
+  let dy = 1;
   let y_start = Math.floor(this.data.range.y.min/dy)*dy;
- 
-  for (let y = y_start; y < this.data.range.y.max; y += dy) {
+  
+  let x0 = this.data.range.x.min;
+  let x1 = this.data.range.x.max;
 
-    let val0 = {'x':this.data.range.x.min,'y':y};
-    let val1 = {'x':this.data.range.x.max,'y':y};
+  for (let y = y_start; y <= this.data.range.y.max; y += dy) {
 
-    let pixel0 = this.VAL2PIXEL(val0);
-    let pixel1 = this.VAL2PIXEL(val1);
+    let v0 = {'x':x0,'y':y};
+    let v1 = {'x':x1,'y':y};
 
-    this.ctx.lineWidth = line_width;
-    this.ctx.strokeStyle = color_string;
-    this.ctx.fillStyle = color_string;
+    let p0 = this.VALUE2PIXEL(v0);
+    let p1 = this.VALUE2PIXEL(v1);
+    
     this.ctx.beginPath();
-    this.ctx.moveTo(pixel0.x, pixel0.y);
-    this.ctx.lineTo(pixel1.x, pixel1.y);
+    this.ctx.moveTo(p0.x, p0.y);
+    this.ctx.lineTo(p1.x, p1.y);
     this.ctx.stroke();   
   }
 };
-
 
 /*
-Box.prototype.SHOW_GRID_X = function(dx, color_string) {
+let obj = {
+  'val':val,
+  'rx':3
+}
+*/
+Box.prototype.SHOW_VALUE = function(obj) {
 
- if (!arguments[0]) {
-  dx = 1;
- }
- let zoom = this.data.zoom.x;
+ let p = this.VALUE2PIXEL(obj.val);
+ this.ctx.beginPath();
+ this.ctx.arc(p.x, p.y, obj.rx, 0, 2*Math.PI);
+ this.ctx.fill();
 
- let alpha_1 = 1;
- let alpha_10 = -1+(1/200)*zoom;
- let color_string_1 = 'rgba(208, 208, 208,' + alpha_1 + ')';
- let color_string_10 = 'rgba(224, 224, 224,' + alpha_10 + ')';
- 
- let x_start = Math.floor(this.data.range.x.min/dx)*dx;
- 
- let i = 0; // BC FLOATING PT NUMBERS MAKE TESTING x%dx TOUGH
- for (let x = x_start; x < this.data.range.x.max; x += dx/10) {
-  if (i%10===0) {
-   let val0 = {'x':x,'y':this.data.range.y.min};
-   let val1 = {'x':x,'y':this.data.range.y.max};
-   this.CONNECTVALUES(val0, val1, color_string_1);
-  }
+}
 
-  let val0 = {'x':x,'y':this.data.range.y.min};
-  let val1 = {'x':x,'y':this.data.range.y.max};
-  this.CONNECTVALUES(val0, val1, color_string_10);
-  i++;
- }
-};
-
+/*
 
 Box.prototype.SHOW_GRID_Y = function(dy, color_string) {
 
@@ -285,8 +253,8 @@ Box.prototype.SHOW_FLOATING_LOG_Y_AXIS = function(n) {
  let p0 = {'x':sw,'y':sh*n1};
  let p1 = {'x':sw,'y':sh*n2};
 
- let v0 = this.PIXEL2VAL(p0);
- let v1 = this.PIXEL2VAL(p1);
+ let v0 = this.PIXEL2VALUE(p0);
+ let v1 = this.PIXEL2VALUE(p1);
  
  this.CONNECTVALUES(v0, v1, '#333', 0.5);
  
@@ -294,8 +262,8 @@ Box.prototype.SHOW_FLOATING_LOG_Y_AXIS = function(n) {
  for (let i = n1; i <= n2; i++) {
   let p0 = {'x':sw-dsw,'y':sh*i};
   let p1 = {'x':sw+dsw,'y':sh*i};
-  let v0 = this.PIXEL2VAL(p0);
-  let v1 = this.PIXEL2VAL(p1);
+  let v0 = this.PIXEL2VALUE(p0);
+  let v1 = this.PIXEL2VALUE(p1);
   this.ctx.fillStyle = '#333';
   this.ctx.textAlign = 'left';
   this.ctx.textBaseline = 'middle';
@@ -319,8 +287,8 @@ Box.prototype.SHOW_FLOATING_Y_AXIS = function(n) {
  let p0 = {'x':sw,'y':sh*n1};
  let p1 = {'x':sw,'y':sh*n2};
 
- let v0 = this.PIXEL2VAL(p0);
- let v1 = this.PIXEL2VAL(p1);
+ let v0 = this.PIXEL2VALUE(p0);
+ let v1 = this.PIXEL2VALUE(p1);
  
  this.CONNECTVALUES(v0, v1, '#333', 0.5);
  
@@ -328,8 +296,8 @@ Box.prototype.SHOW_FLOATING_Y_AXIS = function(n) {
  for (let i = n1; i <= n2; i++) {
   let p0 = {'x':sw-dsw,'y':sh*i};
   let p1 = {'x':sw+dsw,'y':sh*i};
-  let v0 = this.PIXEL2VAL(p0);
-  let v1 = this.PIXEL2VAL(p1);
+  let v0 = this.PIXEL2VALUE(p0);
+  let v1 = this.PIXEL2VALUE(p1);
   this.ctx.fillStyle = '#333';
   this.ctx.textAlign = 'left';
   this.ctx.textBaseline = 'middle';
@@ -349,8 +317,8 @@ Box.prototype.SHOW_FLOATING_LOG_X_AXIS = function(obj) {
   let x_1 = this.data.dimension.w - x_0;
   let y = this.data.dimension.h*4.25/5;
   
-  let val_0 = this.PIXEL2VAL({'x':x_0,'y':y});
-  let val_1 = this.PIXEL2VAL({'x':x_1,'y':y});
+  let val_0 = this.PIXEL2VALUE({'x':x_0,'y':y});
+  let val_1 = this.PIXEL2VALUE({'x':x_1,'y':y});
   
   this.CONNECT_VALUES({
     'vals':[val_0, val_1]
@@ -368,7 +336,7 @@ Box.prototype.SHOW_FLOATING_X_AXIS = function(n, y_val) {
  if (arguments[1] !== null) {
    let v3 = {'x':0,'y':y_val};
    //console.log(v3);
-   let p3 = this.VAL2PIXEL(v3);
+   let p3 = this.VALUE2PIXEL(v3);
    //console.log(p3);
    sh = p3.y;
  } else {
@@ -382,8 +350,8 @@ Box.prototype.SHOW_FLOATING_X_AXIS = function(n, y_val) {
  let p0 = {'x':sw*n1,'y':sh};
  let p1 = {'x':sw*n2,'y':sh};
 
- let v0 = this.PIXEL2VAL(p0);
- let v1 = this.PIXEL2VAL(p1);
+ let v0 = this.PIXEL2VALUE(p0);
+ let v1 = this.PIXEL2VALUE(p1);
  
  this.CONNECTVALUES(v0, v1, '#333', 0.5);
 
@@ -391,8 +359,8 @@ Box.prototype.SHOW_FLOATING_X_AXIS = function(n, y_val) {
  for (let i = n1; i <= n2; i++) {
   let p0 = {'x':sw*i,'y':sh+dsh};
   let p1 = {'x':sw*i,'y':sh-dsh};
-  let v0 = this.PIXEL2VAL(p0);
-  let v1 = this.PIXEL2VAL(p1);
+  let v0 = this.PIXEL2VALUE(p0);
+  let v1 = this.PIXEL2VALUE(p1);
   this.ctx.fillStyle = '#333';
   this.ctx.textAlign = 'center';
   this.ctx.textBaseline = 'top';
@@ -439,12 +407,12 @@ Box.prototype.showAxes = function(fontSize) {
    let s1 = 30;
    let c = {'x':s0, 'y':this.data.dimension.h - s0};
 
-   let o = this.PIXEL2VAL(c);
+   let o = this.PIXEL2VALUE(c);
    console.log(o);
    console.log(this.data.range);
    
    let cx = {'x':s0+s1, 'y':this.data.dimension.h - s0};
-   let ox = this.PIXEL2VAL(cx);
+   let ox = this.PIXEL2VALUE(cx);
    
    let cy = {'x':s0, 'y':this.data.dimension.h - (s0 + s1)};
    
@@ -467,7 +435,7 @@ Box.prototype.showAxes = function(fontSize) {
 
 Box.prototype.SHOWVALUE = function(val, colorstring, rx) {
 
- let pixel = this.VAL2PIXEL(val);
+ let pixel = this.VALUE2PIXEL(val);
  this.ctx.fillStyle = colorstring;
  this.ctx.beginPath();
  this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
@@ -489,7 +457,7 @@ Box.prototype.DRAW_POINT = function(obj) {
   if (obj.color_string) {color_string = obj.color_string}
   if (obj.rx) {rx = obj.rx}
 
-  let pixel = this.VAL2PIXEL(obj.val);
+  let pixel = this.VALUE2PIXEL(obj.val);
   this.ctx.fillStyle = color_string;
   this.ctx.beginPath();
   this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
@@ -521,8 +489,8 @@ Box.prototype.DRAW_LINE = function(obj) {
     'y':val0.y + this.data.range.x.span*obj.slope
   };
   
- let pixel0 = this.VAL2PIXEL(val0);
- let pixel1 = this.VAL2PIXEL(val1);
+ let pixel0 = this.VALUE2PIXEL(val0);
+ let pixel1 = this.VALUE2PIXEL(val1);
 
  this.ctx.lineWidth = line_width;
  
@@ -551,8 +519,8 @@ Box.prototype.CONNECT_VALUES = function(obj) {
 
   for (let i = 0; i < obj.vals.length-1; i++) {
 
-    let pixel_0 = this.VAL2PIXEL(obj.vals[i]);
-    let pixel_1 = this.VAL2PIXEL(obj.vals[i+1]);
+    let pixel_0 = this.VALUE2PIXEL(obj.vals[i]);
+    let pixel_1 = this.VALUE2PIXEL(obj.vals[i+1]);
 
     this.ctx.lineWidth = line_width;
     this.ctx.strokeStyle = color_string;
@@ -567,8 +535,8 @@ Box.prototype.CONNECT_VALUES = function(obj) {
 
 Box.prototype.CONNECTVALUES = function(val0, val1, color_string, line_width) {
 
- let pixel0 = this.VAL2PIXEL(val0);
- let pixel1 = this.VAL2PIXEL(val1);
+ let pixel0 = this.VALUE2PIXEL(val0);
+ let pixel1 = this.VALUE2PIXEL(val1);
 
  this.ctx.lineWidth = (line_width || 1);
  
@@ -589,8 +557,8 @@ Box.prototype.CONNECTVALUES2 = function(arr, color_string, line_width) {
 
   for (let i = 0; i < arr.length-1; i++) {
 
-    let pixel0 = this.VAL2PIXEL(arr[i+0]);
-    let pixel1 = this.VAL2PIXEL(arr[i+1]);
+    let pixel0 = this.VALUE2PIXEL(arr[i+0]);
+    let pixel1 = this.VALUE2PIXEL(arr[i+1]);
 
     this.ctx.lineWidth = (line_width || 1);
     this.ctx.strokeStyle = color_string;
@@ -603,7 +571,7 @@ Box.prototype.CONNECTVALUES2 = function(arr, color_string, line_width) {
 }
 
 Box.prototype.RECT_OUTLINE = function(val, w, h, color_string, line_width) {
- let pixel = this.VAL2PIXEL(val);
+ let pixel = this.VALUE2PIXEL(val);
  this.ctx.lineWidth = (line_width || 1);
  this.ctx.strokeStyle = (color_string || '#333');
  this.ctx.beginPath();
@@ -611,12 +579,12 @@ Box.prototype.RECT_OUTLINE = function(val, w, h, color_string, line_width) {
  this.ctx.stroke();
 }
 Box.prototype.RECT_SOLID = function(val, w, h, color_string, line_width) {
- let pixel = this.VAL2PIXEL(val);
+ let pixel = this.VALUE2PIXEL(val);
  this.ctx.fillStyle = (color_string || '#fff');
  this.ctx.fillRect(pixel.x, pixel.y, w*this.data.zoom.x, h*this.data.zoom.y);
 }
 Box.prototype.TEXT = function(str, val, color_string, font_size, font_family) {
- let pixel = this.VAL2PIXEL(val);
+ let pixel = this.VALUE2PIXEL(val);
  //console.log(pixel);
  font_size = (font_size || 15);
  font_family = (font_family || 'Arial');
@@ -625,46 +593,6 @@ Box.prototype.TEXT = function(str, val, color_string, font_size, font_family) {
  this.ctx.fillText(str, pixel.x, pixel.y);
 }
 
-Box.prototype.draw = function() {
-  
-  this.maps.forEach(function(a, b, c) {
-
-    let arr = a;
-    //console.log(arr);
-      /*
-   // what is the operation?
-   let operation = (function() {
-     if (a[0] === 'get') {
-       return function(a) {
-         return a;
-       }
-     }
-     if (a[0] === '**') {
-       return function(a,b) {
-         return a**b;
-       }
-     }
-    if (a[0] === '+') {  /// its not arguments, i need arguments of 
-      return function(a,b) {
-        return a + b;
-      }
-    };
-    if (a[0] === '*') {
-      return function(a,b) {
-        return a*b;
-      }
-    };
-   })();
-   console.log(operation);
-   */
-   
-   for (let i = this.data.range.x.min; i < this.data.range.x.max; i++) {
-     let val = {'x':i,'y':abc(i,arr)};
-     this.SHOWVALUE(val, '#fc0', 2);
-   }
-  }.bind(this));
-
-}
 
 function abc(x, arr) {
 
@@ -719,7 +647,7 @@ Box.prototype.DRAW_HISTOGRAM = function(obj) {
   }
 */
 Box.prototype.DRAW_VALUE = function(obj) {
- let pixel = this.VAL2PIXEL(obj.val);
+ let pixel = this.VALUE2PIXEL(obj.val);
  this.ctx.fillStyle = obj.colorstring;
  this.ctx.beginPath();
  this.ctx.arc(pixel.x, pixel.y, obj.rx, 0, 2*Math.PI);
@@ -924,7 +852,7 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
         this.CONNECTVALUES(temp[7], val, line_color.hicksian.final.y, line_width);
         temp[7] = val;
         
-        let pixel = this.VAL2PIXEL({'x':py_1,'y':yc_1});
+        let pixel = this.VALUE2PIXEL({'x':py_1,'y':yc_1});
         this.ctx.fillStyle = line_color.hicksian.final.y;
         this.ctx.beginPath();
         this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
@@ -942,7 +870,7 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
         let lnpx_0 = Math.log(px_0);
         let lnxc_0 = Math.log(u_0) + beta_0 * Math.log(py_0*alpha_0/beta_0) - beta_0 * lnpx_0;
         
-        let pixel = this.VAL2PIXEL({'x':lnpx_0,'y':lnxc_0});
+        let pixel = this.VALUE2PIXEL({'x':lnpx_0,'y':lnxc_0});
         this.ctx.fillStyle = line_color.hicksian.initial.x;
         this.ctx.beginPath();
         this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
@@ -962,7 +890,7 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
         this.CONNECTVALUES(temp[4], val, line_color.hicksian.initial.x, line_width);
         temp[4] = val;
         
-        let pixel = this.VAL2PIXEL({'x':px_0,'y':u_0*(py_0/px_0*alpha_0/beta_0)**beta_0});
+        let pixel = this.VALUE2PIXEL({'x':px_0,'y':u_0*(py_0/px_0*alpha_0/beta_0)**beta_0});
         this.ctx.fillStyle = line_color.hicksian.initial.x;
         this.ctx.beginPath();
         this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI); // THIS POINT WILL ACTUALLY NOT BE SEEN
@@ -999,7 +927,7 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
         this.CONNECTVALUES(temp[5], val, line_color.hicksian.initial.y, line_width);
         temp[5] = val;
         
-        let pixel = this.VAL2PIXEL({'x':py_0,'y':u_0*(px_0/py_0*beta_0/alpha_0)**alpha_0});
+        let pixel = this.VALUE2PIXEL({'x':py_0,'y':u_0*(px_0/py_0*beta_0/alpha_0)**alpha_0});
         this.ctx.fillStyle = line_color.hicksian.initial.y;
         this.ctx.beginPath();
         this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI); // THIS POINT WILL ACTUALLY NOT BE SEEN
@@ -1036,7 +964,7 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
         this.CONNECTVALUES(temp[3], val, line_color.marshallian.final.y, line_width);
         temp[3] = val;
         
-        let pixel = this.VAL2PIXEL({'x':py_1,'y':(beta_1 * budget_1 / py_1)});
+        let pixel = this.VALUE2PIXEL({'x':py_1,'y':(beta_1 * budget_1 / py_1)});
         this.ctx.fillStyle = line_color.marshallian.final.y;
         this.ctx.beginPath();
         this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
@@ -1055,7 +983,7 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
         let lnpx_1 = Math.log(px_1);
         let lnx_1 = Math.log(alpha_1*budget_1) - lnpx_1;
         
-        let pixel = this.VAL2PIXEL({'x':lnpx_1,'y':lnx_1});
+        let pixel = this.VALUE2PIXEL({'x':lnpx_1,'y':lnx_1});
         this.ctx.fillStyle = line_color.marshallian.final.x;
         this.ctx.beginPath();
         this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
@@ -1075,7 +1003,7 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
         this.CONNECTVALUES(temp[2], val, line_color.marshallian.final.x, line_width);
         temp[2] = val;
         
-        let pixel = this.VAL2PIXEL({'x':px_1,'y':(alpha_1 * budget_1 / px_1)});
+        let pixel = this.VALUE2PIXEL({'x':px_1,'y':(alpha_1 * budget_1 / px_1)});
         this.ctx.fillStyle = line_color.marshallian.final.x;
         this.ctx.beginPath();
         this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
@@ -1112,7 +1040,7 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
         this.CONNECTVALUES(temp[1], val, line_color.marshallian.initial.y, line_width);
         temp[1] = val;
         
-        let pixel = this.VAL2PIXEL({'x':py_0,'y':(beta_0 * budget_0 / py_0)});
+        let pixel = this.VALUE2PIXEL({'x':py_0,'y':(beta_0 * budget_0 / py_0)});
         this.ctx.fillStyle = line_color.marshallian.initial.y;
         this.ctx.beginPath();
         this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
@@ -1131,7 +1059,7 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
         let lnpx_0 = Math.log(px_0);
         let lnx_0 = Math.log(alpha_0*budget_0) - lnpx_0;
         
-        let pixel = this.VAL2PIXEL({'x':lnpx_0,'y':lnx_0});
+        let pixel = this.VALUE2PIXEL({'x':lnpx_0,'y':lnx_0});
         this.ctx.fillStyle = line_color.marshallian.initial.x;
         this.ctx.beginPath();
         this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
@@ -1151,7 +1079,7 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
         this.CONNECTVALUES(temp[0], val, line_color.marshallian.initial.x, line_width);
         temp[0] = val;
         
-        let pixel = this.VAL2PIXEL({'x':px_0,'y':(alpha_0 * budget_0 / px_0)});
+        let pixel = this.VALUE2PIXEL({'x':px_0,'y':(alpha_0 * budget_0 / px_0)});
         this.ctx.fillStyle = line_color.marshallian.initial.x;
         this.ctx.beginPath();
         this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
@@ -1276,7 +1204,7 @@ Box.prototype.DRAW_ISOQUANT = function(obj) {
   }
 
   // SHOW ALLOCATION
-  let pixel = this.VAL2PIXEL({'x':x,'y':y});
+  let pixel = this.VALUE2PIXEL({'x':x,'y':y});
   this.ctx.fillStyle = color_string;
   this.ctx.beginPath();
   this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
@@ -1307,8 +1235,8 @@ Box.prototype.DRAW_BUDGET_LINE = function(obj) {
   let x_int = {'x':budget/px,'y':0};
   let y_int = {'x':0,'y':budget/py};
 
-  let pixel0 = this.VAL2PIXEL(x_int);
-  let pixel1 = this.VAL2PIXEL(y_int);
+  let pixel0 = this.VALUE2PIXEL(x_int);
+  let pixel1 = this.VALUE2PIXEL(y_int);
 
   this.ctx.lineWidth = line_width;
  
