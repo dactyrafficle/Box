@@ -37,11 +37,13 @@ function Box() {
       'x':{
         'min':0,
         'max':0,
+        'avg':0,
         'span':0
       },
       'y':{
         'min':0,
         'max':0,
+        'avg':0,
         'span':0
       }
     }
@@ -63,9 +65,10 @@ function Box() {
   this.RANGE_Y(0, 100);
   this.CANVAS_SIZE(100, 100);
 
-  // this.c.style.border = '1px solid #ddd';
-
+  this.ctx.radius = 3;
 }
+
+
 
 Box.prototype.RETURN_CANVAS = function() {
   return this.c;
@@ -99,7 +102,8 @@ Box.prototype.ADD_MOUSEMOVE = function() {
 Box.prototype.RANGE_X = function(min, max) {
   this.data.range.x.min = min;
   this.data.range.x.max = max;
-  this.data.range.x.span = max-min;
+  this.data.range.x.avg = (max + min) / 2;
+  this.data.range.x.span = max - min;
   this.data.zoom.x = this.data.dimension.w / this.data.range.x.span;
   this.data.translate.x = -this.data.range.x.min;
 }
@@ -107,7 +111,8 @@ Box.prototype.RANGE_X = function(min, max) {
 Box.prototype.RANGE_Y = function(min, max) {
   this.data.range.y.min = min;
   this.data.range.y.max = max;
-  this.data.range.y.span = max-min;
+  this.data.range.y.avg = (max + min) / 2;
+  this.data.range.y.span = max - min;
   this.data.zoom.y = this.data.dimension.h / this.data.range.y.span;
   this.data.translate.y = -this.data.range.y.min;
 }
@@ -147,6 +152,9 @@ Box.prototype.FILL_STYLE = function(x) {
 
 Box.prototype.LINE_WIDTH = function(x) {
   this.ctx.lineWidth = x; 
+}
+Box.prototype.RADIUS = function(rx) {
+  this.ctx.radius = rx;
 }
 
 Box.prototype.SHOW_GRID_X = function() {
@@ -196,20 +204,62 @@ Box.prototype.SHOW_GRID_Y = function() {
   }
 };
 
-/*
-let obj = {
-  'val':val,
-  'rx':3
-}
-*/
-Box.prototype.SHOW_VALUE = function(obj) {
+// val = {'x':x,'y':y}
+Box.prototype.VALUE_IN_RANGE = function(val) {
 
- let p = this.VALUE2PIXEL(obj.val);
+  let x = val.x;
+  let y = val.y;
+  let x_min = this.data.range.x.min;
+  let x_max = this.data.range.x.max; 
+  let y_min = this.data.range.y.min;
+  let y_max = this.data.range.y.max;
+  
+  if (x >= x_min && x <= x_max && y >= y_min && y <= y_max) {
+    return true;
+  } else {
+    return false;
+  }
+
+}
+
+// val = {'x':x,'y':y}
+// this.RADIUS(rx)
+Box.prototype.SHOW_VALUE = function(val) {
+
+ let p = this.VALUE2PIXEL(val);
+ let r = this.ctx.radius;
+
  this.ctx.beginPath();
- this.ctx.arc(p.x, p.y, obj.rx, 0, 2*Math.PI);
+ this.ctx.arc(p.x, p.y, r, 0, 2*Math.PI);
  this.ctx.fill();
 
 }
+
+
+// let vals = [val, val,...]
+// b.LINE_WIDTH(1);
+// b.STROKE_STYLE('#ddd');
+
+Box.prototype.CONNECT_VALUES = function(vals) {
+
+  for (let i = 0; i < vals.length-1; i++) {
+
+    let pixel_0 = this.VALUE2PIXEL(vals[i+0]);
+    let pixel_1 = this.VALUE2PIXEL(vals[i+1]);
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(pixel_0.x, pixel_0.y);
+    this.ctx.lineTo(pixel_1.x, pixel_1.y);
+    this.ctx.stroke();
+  }
+}
+
+
+
+
+
+
+
 
 /*
 
@@ -503,35 +553,7 @@ Box.prototype.DRAW_LINE = function(obj) {
 
 }
 
-/*
-let obj = {
-  'vals':[{},{},...],
-  'color_string':'#999',
-  'line_width':2
-}
-*/
-Box.prototype.CONNECT_VALUES = function(obj) {
 
-  let color_string = '#999';
-  let line_width = 2;
-  if (obj.color_string) {color_string = obj.color_string}
-  if (obj.line_width) (line_width = obj.line_width);
-
-  for (let i = 0; i < obj.vals.length-1; i++) {
-
-    let pixel_0 = this.VALUE2PIXEL(obj.vals[i]);
-    let pixel_1 = this.VALUE2PIXEL(obj.vals[i+1]);
-
-    this.ctx.lineWidth = line_width;
-    this.ctx.strokeStyle = color_string;
-    // this.ctx.fillStyle = color_string;
-
-    this.ctx.beginPath();
-    this.ctx.moveTo(pixel_0.x, pixel_0.y);
-    this.ctx.lineTo(pixel_1.x, pixel_1.y);
-    this.ctx.stroke();
-  }
-}
 
 Box.prototype.CONNECTVALUES = function(val0, val1, color_string, line_width) {
 
@@ -1104,114 +1126,7 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
 }
 
 
-/*
- obj = {
-  'alpha':alpha,
-  'beta':beta,
-  'u':u,
-  'x':x,
-  'y':y
-  'M',M,
-  'px':px,
-  'py':py,
-  'color_string':#000,
-  'line_width':1,
-  'inverted':false,
-  'color_string':#000,
-  'rx':3
- }
-*/
-Box.prototype.DRAW_ISOQUANT = function(obj) {
 
-  // must have alpha and beta
-  // and we must either have utility, or have what we need to make utility
- 
-  // case 1 : u
-  // case 2 : u=f(x,y)
-  // case 3 : x=f(M,px) : y=f(M,py) : u=f(x,y)
-  
-  let line_width = 2;
-  let color_string = '#000';
-  let rx = 4;
-  let inverted = false;
-
-  if (obj) {
-    if (obj.color_string) {color_string = obj.color_string};
-  }
-
-
-  let alpha, alpha_inv, beta, beta_inv;
-  let u;
-  let x, y;
-
-  if (!obj.alpha || !obj.beta) {
-    console.log('you need alpha and beta');
-    return;
-  } else {
-    alpha = obj.alpha;
-    alpha_inv = 1/alpha;
-    beta = obj.beta;
-    beta_inv = 1/beta;
-  }
-
-  // FIRST CASE :
-  if (obj.u) {
-    u = obj.u;
-  }
-
-  // SECOND CASE : u = u(x, y)
-  if (!obj.u && (obj.x && obj.y)) {
-    x = obj.x;
-    y = obj.y;
-    u = x**alpha*y**beta;
-  }
-
-  // THIRD CASE : u = u(budget, px, py)
-  let budget, px, py;
-  if (!obj.u && (!obj.x && !obj.y) && (obj.budget && obj.px && obj.py)) {
-    // console.log('CASE 3');
-    budget = obj.budget;
-    px = obj.px;
-    py = obj.py;
-    x = alpha*budget/px;
-    y = beta*budget/py;
-    u = x**alpha*y**beta;
-  }
-
-  let dx_pixel = 2; // if dx_pixel = 2, then we calculate x-y every 2nd pixel
-  let dx = dx_pixel * (this.data.range.x.span / this.data.dimension.w );
-
-  let temp = {
-    'x':this.data.range.x.min,
-    'y':(u/this.data.range.x.min**obj.alpha)**beta_inv
-  };
-  
-  for (let x = this.data.range.x.min+dx; x < this.data.range.x.max+dx; x += dx) {
-
-    let y = (u/x**alpha)**beta_inv;
-    let val;
-    
-    if (obj.inverted) {
-      val = {'x':x, 'y':y};
-      this.CONNECTVALUES({'x':this.data.range.x.max-temp.x, 'y':this.data.range.y.max-temp.y}, {'x':this.data.range.x.max-x, 'y':this.data.range.y.max-y}, color_string, line_width);
-      temp = val;
-    } else {
-      val = {'x':x, 'y': y};
-      this.CONNECTVALUES(temp, val, color_string, line_width);
-      temp = val;
-    }
-    
-  }
-
-  // SHOW ALLOCATION
-  let pixel = this.VALUE2PIXEL({'x':x,'y':y});
-  this.ctx.fillStyle = color_string;
-  this.ctx.beginPath();
-  this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
-  this.ctx.fill();
-  
-  
-}
 
 /*
   let obj = {

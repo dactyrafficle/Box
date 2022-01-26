@@ -2,13 +2,76 @@
 <html>
 <head>
 
-  <title>THIS</title>
+  <title> BOX </title>
   <link rel="stylesheet" href="a.css">
   <link rel="icon" href="a.png">
   <script src='Box.js'></script>
+  <script src='GET_CES_MARSHALLIAN_ALLOCATIONS.js'></script>
+  <script src='SHOW_CES_INDIFFERENCE_CURVE.js'></script>
+  
+  <script src="./katex/katex.min.js"></script>
+  <link rel="stylesheet" href="./katex/katex.min.css" >
+  <script src="./a.js"></script>
 
 </head>
 <body>
+
+<div class='section'>
+
+<div class='box'>
+
+<pre>
+
+// PIXEL : FOR THE CANVAS
+// VALUE : OUR VALUES
+// BOTTOM-LEFT IS 0-0
+
+let value = PIXEL2VALUE({'x':5,'y':5}); 
+let pixel = VALUE2PIXEL({'x':5,'y':5});
+
+// RETURNS TRUE/FALSE
+b.VALUE_IN_RANGE({'x':5,'y':5});
+
+</pre>
+
+
+</div>
+ 
+ <div class='box'>
+ <pre>
+ // in hex 
+ b.STROKE_STYLE('ddd');
+ b.FILL_STYLE('#fc0a');
+ 
+ // measured in pixels
+ b.RADIUS(3);
+ b.LINE_WIDTH(1);
+ 
+ </pre>
+ </div>
+
+
+<div class='box'>
+
+<pre>
+ // DRAW A POINT 
+ b.FILL_STYLE('#fc0a');
+ b.RADIUS(3);
+ b.SHOW_VALUE({'x':5,'y':5});
+
+
+ // CONNECT POINTS
+ b.LINE_WIDTH(3);
+ b.STROKE_STYLE('#fcfa');
+ b.CONNECT_VALUES([
+  {'x':6,'y':6},
+  {'x':7,'y':7},
+  {'x':4,'y':7}
+  ]);
+
+</pre>
+</div>
+</div>
 
 <div class='section'>
 
@@ -34,14 +97,10 @@ b.STROKE_STYLE('#ddd');
 b.SHOW_GRID_X();
 b.SHOW_GRID_Y();
 
-<span class='comment'>// DRAW A POINT </span>
-b.FILL_STYLE('#fc0a');
-b.SHOW_VALUE({
-  'val':{'x':5,'y':5},
-  'rx':3
-});
-  
-</pre>
+ <span class='comment'>// DRAW A POINT </span>
+ b.FILL_STYLE('#fc0a');
+ b.RADIUS(3);
+ b.SHOW_VALUE({'x':5,'y':5});</pre>
 
 <pre>
 
@@ -52,7 +111,76 @@ b.PIXEL2VALUE();
 
 </div>
 
-<div class='box' id='container'></div>
+<div class='box' id='container_000'></div>
+
+<div class='box'>
+
+  <h4> <span class='math'> \delta \lt 0 </span> </h4>
+
+<p> <span class='math'> u = \dfrac{\alpha}{\delta} \cdot x^{\delta} + \dfrac{\beta}{\delta} \cdot y^{\delta} </span></p>
+<p> <span class='math'> u(\delta, \alpha, \beta, x, y) = u(\delta, \alpha, x) + u(\delta, \beta, y) </span></p>
+
+<p> first: <span class='math'>\alpha, \beta, x, y \gt 0 </span> </p>
+<p> you could consider the case where any of them are equal to 0, but then you could just remove the term </p>
+
+<p> if <span class='math'>\delta \lt 0 </span> then :</p>
+<ul>
+  <li><p><span class='math'> \dfrac{\alpha}{\delta} \cdot x^{\delta} \lt 0 </span></p>
+  <li><p><span class='math'> \dfrac{\beta}{\delta} \cdot y^{\delta} \lt 0 </span></p>
+  <li><p>therefore <span class='math'> u \lt 0 </span></p>
+</ul>
+
+<p> that is interesting. if you have numbers, a, b, c &gt; 0, and c = a + b, then a, b &lt; c </p>
+<p> a + b = c, a = c - b, a &gt; 0, c - b &gt; 0, c &gt; b and the same for a</p>
+
+<p> in this case, it's the reverse. so both <span class='math'> u(\delta, \alpha, x), u(\delta, \beta, y) \lt u </span></p>
+
+<p> so that means that when <span class='math'> \delta \lt 0 </span> there is actually a lower limit on x and y </p>
+
+<ul>
+ <li><p><span class='math'> \dfrac{\alpha}{\delta} \cdot x^{\delta} \lt u </span></p>
+ <li><p><span class='math'> \dfrac{\beta}{\delta} \cdot y^{\delta} \lt u </span></p>
+</ul>
+
+<p> <span class='math'> x_{min} = \big ( \dfrac{\delta}{\alpha} \cdot u \big ) ^{\frac{1}{\delta}} </span></p>
+<p> <span class='math'> y_{min} = \big( \dfrac{\delta}{\beta} \cdot u \big ) ^{\frac{1}{\delta}} </span></p>
+
+<h4> it is relevant </h4>
+<p> I wouldn't have figured this out if I hadn't worked on animating it. The mechanism I was using to graph it was producing weird results, so I had to examine this really closely. </p>
+
+<p> as long as i follow this, I can use <span class='math'> y = \Big ( \dfrac{\delta}{\beta} \cdot u - \dfrac{\alpha}{\beta} \cdot x ^{\delta}  \Big ) ^{\frac{1}{\delta}} </span>
+
+<p> remember not to assume here in consumer theory that alpha + beta = 1 </p>
+
+</div>
+
+<div class='box'>
+
+<p> If you have a range, and no utility, it's probably better to use whatever utility corresponds to cx cy of the canvas </p>
+<p> if you supply a utility, the algorithm will give preference to that </p>
+
+<input type='number' value=0.01 step=0.01 id='myinput' />
+
+<pre>
+
+ <span class='comment'>// u = (alpha/delta)*x**delta + (beta/delta)*y**delta </span>
+
+ b.LINE_WIDTH(2);
+ b.STROKE_STYLE('#fc0');
+ b.SHOW_INDIFFERENCE_CURVE({
+  'delta':0.01,    <span class='comment'> // NECESSARY </span>
+  'alpha':0.5,     <span class='comment'> // NECESSARY </span>
+  'beta':0.5,      <span class='comment'> // NECESSARY </span>
+  'u':null,
+  'x':b.data.range.x.avg,
+  'y':b.data.range.y.avg
+ });
+   
+</pre>
+ 
+</div>
+
+<div class='box' id='container_001'></div>
 
 </div>
 
@@ -60,35 +188,108 @@ b.PIXEL2VALUE();
 
 <script>
 
+(function() {
+
+  let b, c;
+  window.addEventListener('load', function() {
+
+    b = new Box();
+    c = b.RETURN_CANVAS();
+    container_000.appendChild(c);
+    
+    b.CANVAS_SIZE(500, 500);    // this is the number of pixels
+    b.RANGE_X(-1, 11);          // set the range in x
+    b.RANGE_Y(-1, 11);          // set the range in y 
+
+    b.ADD_CLICK();
+    b.ADD_MOUSEMOVE();
+
+    b.CLEAR_CANVAS();
+
+    b.LINE_WIDTH(1);
+    b.STROKE_STYLE('#ddd');
+    b.SHOW_GRID_X();
+    b.SHOW_GRID_Y();
+    
+    b.FILL_STYLE('#fc0a');
+    b.RADIUS(3);
+    b.SHOW_VALUE({'x':5,'y':5});
+
+    b.LINE_WIDTH(3);
+    b.STROKE_STYLE('#fcfa');
+    b.CONNECT_VALUES([
+      {'x':6,'y':5},
+      {'x':7,'y':7},
+      {'x':4,'y':8}
+    ]);
+
+  }); // CLOSING window.onload
+})(); // CLOSING anon
+
+
+let myinput, obj;
 let b, c;
-
-window.onload = function() {
-
-  b = new Box();
-  c = b.RETURN_CANVAS();
-  container.appendChild(c);
   
-  b.CANVAS_SIZE(500, 500);    // this is the number of pixels
-  b.RANGE_X(-1, 11);          // set the range in x
-  b.RANGE_Y(-1, 11);          // set the range in y 
+(function() {
 
-  b.ADD_CLICK();
-  b.ADD_MOUSEMOVE();
 
-  b.CLEAR_CANVAS();
 
-  b.LINE_WIDTH(1);
-  b.STROKE_STYLE('#ddd');
-  b.SHOW_GRID_X();
-  b.SHOW_GRID_Y();
+  window.addEventListener('load', function() {
   
-  b.FILL_STYLE('#fc0a');
-  b.SHOW_VALUE({
-    'val':{'x':5,'y':5},
-    'rx':3
-  });
+    myinput = document.getElementById('myinput');
 
-}
+    myinput.addEventListener('input', function() {
+    
+      obj.delta = parseFloat(this.value);
+    
+      b.CLEAR_CANVAS();
+
+      b.LINE_WIDTH(1);
+      b.STROKE_STYLE('#ddd');
+      b.SHOW_GRID_X();
+      b.SHOW_GRID_Y();
+
+      b.LINE_WIDTH(2);
+      b.STROKE_STYLE('#fc0a');
+      let a = b.SHOW_INDIFFERENCE_CURVE(obj);
+      console.log(a);
+      
+    });
+
+    b = new Box();
+    c = b.RETURN_CANVAS();
+    container_001.appendChild(c);
+    
+    b.CANVAS_SIZE(500, 500);    // this is the number of pixels
+    b.RANGE_X(-1, 11);          // set the range in x
+    b.RANGE_Y(-1, 11);          // set the range in y 
+
+    obj = {
+      'delta':0.01,       // NECESSARY
+      'alpha':0.5,        // NECESSARY
+      'beta':0.5,         // NECESSARY
+      'u':null,
+      'x':b.data.range.x.avg,
+      'y':b.data.range.y.avg
+    }
+
+    b.ADD_CLICK();
+    b.ADD_MOUSEMOVE();
+
+    b.CLEAR_CANVAS();
+
+    b.LINE_WIDTH(1);
+    b.STROKE_STYLE('#ddd');
+    b.SHOW_GRID_X();
+    b.SHOW_GRID_Y();
+
+    b.LINE_WIDTH(2);
+    b.STROKE_STYLE('#fc0a');
+    let a = b.SHOW_INDIFFERENCE_CURVE(obj);
+    console.log(a);
+
+  }); // CLOSING window.onload
+})(); // CLOSING anon
 
 
 

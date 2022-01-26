@@ -3,6 +3,14 @@ draw little graphs
 
 https://dactyrafficle.github.io/Box/
 
+
+
+point, value : VALUE
+show, display, draw : SHOW
+
+SHOW_VALUE
+
+
 // let box = new Box();
 // let c = box.returnCanvas();
 // container.appendChild(c); 
