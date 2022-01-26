@@ -16,7 +16,7 @@
 </head>
 <body>
 
-<div class='section'>
+<div class='section border'>
 
 <div class='box'>
 
@@ -71,9 +71,22 @@ b.VALUE_IN_RANGE({'x':5,'y':5});
 
 </pre>
 </div>
+
+<div class='box'>
+
+<pre>
+  <span class='comment'>// SHOW THE X-Y AXES </span>
+  b.LINE_WIDTH(2);
+  b.STROKE_STYLE('#999');
+  b.SHOW_AXES();
+</pre>
+
 </div>
 
-<div class='section'>
+
+</div>
+
+<div class='section border'>
 
 <div class='box'>
 
@@ -97,6 +110,10 @@ b.STROKE_STYLE('#ddd');
 b.SHOW_GRID_X();
 b.SHOW_GRID_Y();
 
+b.LINE_WIDTH(2);
+b.STROKE_STYLE('#999');
+b.SHOW_AXES();
+
  <span class='comment'>// DRAW A POINT </span>
  b.FILL_STYLE('#fc0a');
  b.RADIUS(3);
@@ -113,50 +130,14 @@ b.PIXEL2VALUE();
 
 <div class='box' id='container_000'></div>
 
-<div class='box'>
-
-  <h4> <span class='math'> \delta \lt 0 </span> </h4>
-
-<p> <span class='math'> u = \dfrac{\alpha}{\delta} \cdot x^{\delta} + \dfrac{\beta}{\delta} \cdot y^{\delta} </span></p>
-<p> <span class='math'> u(\delta, \alpha, \beta, x, y) = u(\delta, \alpha, x) + u(\delta, \beta, y) </span></p>
-
-<p> first: <span class='math'>\alpha, \beta, x, y \gt 0 </span> </p>
-<p> you could consider the case where any of them are equal to 0, but then you could just remove the term </p>
-
-<p> if <span class='math'>\delta \lt 0 </span> then :</p>
-<ul>
-  <li><p><span class='math'> \dfrac{\alpha}{\delta} \cdot x^{\delta} \lt 0 </span></p>
-  <li><p><span class='math'> \dfrac{\beta}{\delta} \cdot y^{\delta} \lt 0 </span></p>
-  <li><p>therefore <span class='math'> u \lt 0 </span></p>
-</ul>
-
-<p> that is interesting. if you have numbers, a, b, c &gt; 0, and c = a + b, then a, b &lt; c </p>
-<p> a + b = c, a = c - b, a &gt; 0, c - b &gt; 0, c &gt; b and the same for a</p>
-
-<p> in this case, it's the reverse. so both <span class='math'> u(\delta, \alpha, x), u(\delta, \beta, y) \lt u </span></p>
-
-<p> so that means that when <span class='math'> \delta \lt 0 </span> there is actually a lower limit on x and y </p>
-
-<ul>
- <li><p><span class='math'> \dfrac{\alpha}{\delta} \cdot x^{\delta} \lt u </span></p>
- <li><p><span class='math'> \dfrac{\beta}{\delta} \cdot y^{\delta} \lt u </span></p>
-</ul>
-
-<p> <span class='math'> x_{min} = \big ( \dfrac{\delta}{\alpha} \cdot u \big ) ^{\frac{1}{\delta}} </span></p>
-<p> <span class='math'> y_{min} = \big( \dfrac{\delta}{\beta} \cdot u \big ) ^{\frac{1}{\delta}} </span></p>
-
-<h4> it is relevant </h4>
-<p> I wouldn't have figured this out if I hadn't worked on animating it. The mechanism I was using to graph it was producing weird results, so I had to examine this really closely. </p>
-
-<p> as long as i follow this, I can use <span class='math'> y = \Big ( \dfrac{\delta}{\beta} \cdot u - \dfrac{\alpha}{\beta} \cdot x ^{\delta}  \Big ) ^{\frac{1}{\delta}} </span>
-
-<p> remember not to assume here in consumer theory that alpha + beta = 1 </p>
-
 </div>
 
+<div class='section border'>
+
 <div class='box'>
 
-<p> If you have a range, and no utility, it's probably better to use whatever utility corresponds to cx cy of the canvas </p>
+<p> If you have a range, and no utility, it's probably better</p>
+<p>to use whatever utility corresponds to cx cy of the canvas </p>
 <p> if you supply a utility, the algorithm will give preference to that </p>
 
 
@@ -209,6 +190,10 @@ b.PIXEL2VALUE();
     b.STROKE_STYLE('#ddd');
     b.SHOW_GRID_X();
     b.SHOW_GRID_Y();
+    
+    b.LINE_WIDTH(2);
+    b.STROKE_STYLE('#999');
+    b.SHOW_AXES();
     
     b.FILL_STYLE('#fc0a');
     b.RADIUS(3);

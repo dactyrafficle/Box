@@ -1,14 +1,35 @@
-pre {
+
+html, body {
+  font-family: calibri;
+}
+.section {
+  display: block;
+  vertical-align: top;
+  margin: 1vh;
   padding: 1vh;
 }
-
 .box {
   display: inline-block;
   vertical-align: top;
-  border: 1px solid #ddd;
   margin: 1vh;
+  padding: 1vh;
+}
+.border {
+  border: 1px solid #ddd;
+}
+.mytable {
+  border-collapse: collapse;
+}
+.mytable td {
+  border: 1px solid #ddd;
   padding: 1vh;
 }
 .comment {
   color: #2b2f;
+}
+.myinputs {
+  padding: 0.5vh;
+}
+pre {
+  padding: 1vh;
 }

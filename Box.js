@@ -204,6 +204,21 @@ Box.prototype.SHOW_GRID_Y = function() {
   }
 };
 
+Box.prototype.SHOW_AXES = function() {
+  
+  this.CONNECT_VALUES([
+    {'x':0,'y':this.data.range.y.min},
+    {'x':0,'y':this.data.range.y.max}
+  ]);
+  
+  this.CONNECT_VALUES([
+    {'x':this.data.range.x.min,'y':0},
+    {'x':this.data.range.x.max,'y':0}
+  ]);
+  
+}
+
+
 // val = {'x':x,'y':y}
 Box.prototype.VALUE_IN_RANGE = function(val) {
 
@@ -230,7 +245,7 @@ Box.prototype.SHOW_VALUE = function(val) {
  let r = this.ctx.radius;
 
  this.ctx.beginPath();
- this.ctx.arc(p.x, p.y, r, 0, 2*Math.PI);
+ this.ctx.arc(p.x, p.y, r*2, 0, 2*Math.PI);
  this.ctx.fill();
 
 }
