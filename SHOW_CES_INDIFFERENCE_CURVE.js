@@ -10,8 +10,8 @@
   'beta':beta,      // must
   'u':u,            // SUFFICIENT, BUT NOT A GOOD CHOICE
   'x':x,            // PREFERABLE
-  'y':y             // PREFERABLE
-  'M',M,
+  'y':y,            // PREFERABLE
+  'budget':budget,
   'px':px,
   'py':py
  }
@@ -36,6 +36,23 @@ Box.prototype.SHOW_CES_INDIFFERENCE_CURVE = function(obj) {
   // case 1 : u
   // case 2 : u=f(x,y)
   // case 3 : x=f(M,px) : y=f(M,py) : u=f(x,y)
+  
+  
+  // I CAN ACTUALLY SET DELTA = -INFINITY HERE, SO I SHOULD DO THAT, IF DELTA IS BIG ENOUGH
+  
+  
+  let output = {
+    'delta':null,
+    'alpha':null,
+    'beta':null,
+    'u':null,
+    'x':null,            
+    'y':null,
+    'budget':null,
+    'px':null,
+    'py':null,
+    'type':null
+  }
 
   let alpha, alpha_inv, beta, beta_inv, delta, delta_inv;
   let u;
@@ -47,12 +64,15 @@ Box.prototype.SHOW_CES_INDIFFERENCE_CURVE = function(obj) {
   beta_inv = 1/beta;
   
   delta = obj.delta;
+  delta_inv = (1/delta || null);
   
-  if (delta === 0) {
-    delta_inv = null;
-  } else {
-    delta_inv = 1/delta;
-  }
+  // SET THE TYPE
+  output.type = "ELSE";
+  output.delta = delta;
+  if (delta === 1) {output.type = "LINEAR"}
+  if (delta === 0) {output.type = "LOG"}
+  if (delta === -Infinity) {output.type = "LEONTIEFF"}
+
 
   // FIRST CASE :
   if (obj.u) {
@@ -64,11 +84,12 @@ Box.prototype.SHOW_CES_INDIFFERENCE_CURVE = function(obj) {
     x = obj.x;
     y = obj.y;
     
-    if (delta === 0) {
-      u = x**alpha*y**beta;
-    } else {
-      u = (alpha/delta)*x**delta + (beta/delta)*y**delta;
-    }
+    if (output.type === "LINEAR") {u = alpha*x + beta*y};
+    if (output.type === "LOG") {u = x**alpha*y**beta};
+    if (output.type === "LEONTIEFF") {u = 1};
+    if (output.type === "ELSE") {u = (alpha*x**delta + beta*y**delta)**delta_inv};
+    
+    output.u = u;
   }
 
   /*
@@ -84,59 +105,84 @@ Box.prototype.SHOW_CES_INDIFFERENCE_CURVE = function(obj) {
     u = x**alpha*y**beta;
   }
   */
+  
+    
+ 
+  // LINEAR
+  if (output.type === "LINEAR") {
+    this.CONNECT_VALUES([{'x':0,'y':u/beta},{'x':u/alpha,'y':0}]);
+    return output;
+  }
+  
+  // LEONTIEFF
+  if (output.type === "LEONTIEFF") {
+
+    return output;
+  }
+  
+  // FOR LOG AND ELSE, WE LOOP
+  
+  // LOG
+  if (output.type === "LOG") {
+    
+    let dx = this.data.range.x.max / 50;
+    let dy = this.data.range.y.max / 50;
+    let x_index = 0, y_index = 0;
+    let arr = [];
+
+    for (let i = 0; i <= 50; i++) {
+
+      arr[2*i+0] = {'x':x_index,'y':(u/x_index**alpha)**beta_inv};
+      arr[2*i+1] = {'x':(u/x_index**beta)**alpha_inv,'y':y_index};
+      x_index += dx;
+      y_index += dy;
+    }
+    
+    arr.sort(function(a,b) {
+      return a.x - b.x;
+    });
+    this.CONNECT_VALUES(arr);
+    return output;
+  }
+
+  
 
 
 
-  // STORE ALL THE POINTS
+  // THIS IS THE ELSE CASE
+
+  let dx = this.data.range.x.max / 50;
+  let dy = this.data.range.y.max / 50;
+  
+  let x_index = 0, y_index = 0;
   let arr = [];
 
-  // THE RANGE WILL BE FROM 0 TO MAX, SINCE WE CANT HAVE NEGATIVE X OR Y
-  let dx = this.data.range.x.max / 50;
-  let dy = this.data.range.y.max / 50; 
-
   // RELEVANT IF delta < 0
-  let x_min = ((delta/alpha)*u)**delta_inv;
-  let y_min = ((delta/beta)*u)**delta_inv;
+  let x_min = 0; //((delta/alpha)*u)**delta_inv; ************************************
+  let y_min = 0; // ((delta/beta)*u)**delta_inv;
 
-  
-  let x_index = dx;
-  let y_index = dy;
-  
   for (let i = 0; i <= 50; i++) {
-    
-    // THE GENERAL CASES
+  
+    // THE ELSE CASES
     if (delta > 0 || (delta < 0 && x_index >= x_min)) {
       arr.push({
         'x':x_index,
-        'y':((delta/beta)*u - (alpha/beta)*x_index**delta)**delta_inv
+        'y':((u**delta - alpha*x_index**delta)/beta)**delta_inv
       });
     }
 
     if (delta > 0 || (delta < 0 && y_index >= y_min)) {
       arr.push({
-        'x':((delta/alpha)*u - (beta/alpha)*y_index**delta)**delta_inv,
+        'x':((u**delta - beta*y_index**delta)/alpha)**delta_inv,
         'y':y_index
       });
     }
 
-    // COBB-DOUGLAS
-    if (delta === 0) {
-      arr.push({
-        'x':x_index,
-        'y':(u/x_index**alpha)**beta_inv
-      });
-      arr.push({
-        'x':(u/x_index**beta)**alpha_inv,
-        'y':y_index
-      });
-    }
-    
-
-    
     x_index += dx;
     y_index += dy;
     
-  }
+  } // closing for loop
+
   
 
   // SORT ARR : IF it's almost leontieff, ie. delta = -140, then i need to sort by x, from lowest to smallest
@@ -150,19 +196,6 @@ Box.prototype.SHOW_CES_INDIFFERENCE_CURVE = function(obj) {
   
   this.CONNECT_VALUES(arr);
   
-  return {
-    'alpha':alpha,
-    'alpha_inv':alpha_inv,
-    'beta':beta,
-    'beta_inv':beta_inv,
-    'delta':delta,
-    'delta_inv':delta_inv,
-    'x_min':x_min,
-    'y_min':y_min,
-    'u':u,
-    'x':x,
-    'y':y,
-    'preference':null
-  }
+  return output;
 }
 

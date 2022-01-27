@@ -54,35 +54,65 @@ b.VALUE_IN_RANGE({'x':5,'y':5});
 <div class='box'>
 
 <pre>
- // DRAW A POINT 
+ <span class='comment'>// DRAW A POINT</span>
  b.FILL_STYLE('#fc0a');
  b.RADIUS(3);
  b.SHOW_VALUE({'x':5,'y':5});
 
-
- // CONNECT POINTS
+ <span class='comment'>// CONNECT POINTS</span>
  b.LINE_WIDTH(3);
  b.STROKE_STYLE('#fcfa');
  b.CONNECT_VALUES([
   {'x':6,'y':6},
   {'x':7,'y':7},
   {'x':4,'y':7}
-  ]);
+ ]);</pre>
 
-</pre>
 </div>
 
 <div class='box'>
 
 <pre>
-  <span class='comment'>// SHOW THE X-Y AXES </span>
-  b.LINE_WIDTH(2);
-  b.STROKE_STYLE('#999');
-  b.SHOW_AXES();
-</pre>
+ <span class='comment'>// SHOW GRIDLINES</span>
+ b.LINE_WIDTH(1);
+ b.STROKE_STYLE('#ddd');
+ b.SHOW_GRID_X();
+ b.SHOW_GRID_Y();
+ 
+ <span class='comment'>// SHOW THE X-Y AXES</span>
+ b.LINE_WIDTH(2);
+ b.STROKE_STYLE('#999');
+ b.SHOW_AXES();</pre>
 
 </div>
 
+ <div class='box'>
+ <div class='section'><h4> econ related </h4></div>
+ <pre>
+ <span class='comment'>// OPTIONAL RETURN VALUE </span>
+ b.LINE_WIDTH(2);
+ b.STROKE_STYLE('#fc0a');
+ let a = b.SHOW_CES_INDIFFERENCE_CURVE({
+  'delta':delta,     <span class='comment'>// REQUIRED </span>
+  'alpha':alpha,     <span class='comment'>// REQUIRED </span>
+  'beta':beta,       <span class='comment'>// REQUIRED </span>
+  'u':null,
+  'x':b.data.range.x.avg,
+  'y':b.data.range.y.avg
+ });
+ 
+ <span class='comment'>// RETURN VALUE </span>
+ let allocation = b.GET_CES_MARSHALLIAN_ALLOCATION({
+  'delta':delta,
+  'alpha':alpha,
+  'beta':beta,
+  'px':px,
+  'py':py,
+  'budget':budget
+ })
+ </pre>
+ 
+ </div>
 
 </div>
 
@@ -118,13 +148,6 @@ b.SHOW_AXES();
  b.FILL_STYLE('#fc0a');
  b.RADIUS(3);
  b.SHOW_VALUE({'x':5,'y':5});</pre>
-
-<pre>
-
-b.VALUE2PIXEL();
-b.PIXEL2VALUE();
-
-</pre>
 
 </div>
 
