@@ -9,6 +9,8 @@
   <script src='GET_CES_MARSHALLIAN_ALLOCATION.js'></script>
   <script src='SHOW_CES_INDIFFERENCE_CURVE.js'></script>
   
+  <script src='setup_ces_idc.js'></script>
+  
   <script src="./katex/katex.min.js"></script>
   <link rel="stylesheet" href="./katex/katex.min.css" >
   <script src="./a.js"></script>
@@ -159,17 +161,18 @@ b.SHOW_AXES();
 
 <div class='box'>
 
-<p> If you have a range, and no utility, it's probably better</p>
-<p>to use whatever utility corresponds to cx cy of the canvas </p>
-<p> if you supply a utility, the algorithm will give preference to that </p>
+  <h4> graphing ces utility </h4>
+  <p><span class='math'>u= \big ( \alpha ^ {\delta} + \beta ^ {\delta} \big ) ^ {1/{\delta}}</span></p>
+
+  <p> If you have a range, and no utility, it's probably better</p>
+  <p> to use whatever utility corresponds to cx cy of the canvas </p>
+  <p> but if you supply a utility, the algorithm will give preference to that </p>
 
 
 <pre>
 
- <span class='comment'>// u = (alpha/delta)*x**delta + (beta/delta)*y**delta </span>
-
  b.LINE_WIDTH(2);
- b.STROKE_STYLE('#fc0');
+ b.STROKE_STYLE('#fc0a');
  b.SHOW_INDIFFERENCE_CURVE({
   'delta':0.01,    <span class='comment'> // NECESSARY </span>
   'alpha':0.5,     <span class='comment'> // NECESSARY </span>
@@ -183,7 +186,7 @@ b.SHOW_AXES();
  
 </div>
 
-<div class='box' id='container_001'></div>
+<div class='box' id='container_ces_idc'></div>
 
 </div>
 
@@ -232,83 +235,6 @@ b.SHOW_AXES();
 
   }); // CLOSING window.onload
 })(); // CLOSING anon
-
-
-let myinput, obj;
-let b, c;
-  
-(function() {
-
-
-  window.addEventListener('load', function() {
-  
-    myinput = document.getElementById('myinput');
-
-    b = new Box();
-    c = b.RETURN_CANVAS();
-    container_001.appendChild(c);
-    
-    b.CANVAS_SIZE(500, 500);    // this is the number of pixels
-    b.RANGE_X(-1, 11);          // set the range in x
-    b.RANGE_Y(-1, 11);          // set the range in y 
-
-    b.ADD_CLICK();
-    b.ADD_MOUSEMOVE();
-
-    b.CLEAR_CANVAS();
-
-    b.LINE_WIDTH(1);
-    b.STROKE_STYLE('#ddd');
-    b.SHOW_GRID_X();
-    b.SHOW_GRID_Y();
-
-    b.LINE_WIDTH(2);
-    b.STROKE_STYLE('#5d5d');
-    b.SHOW_CES_INDIFFERENCE_CURVE({
-      'delta':0.5,
-      'alpha':0.5,
-      'beta':0.5,
-      'u':null,
-      'x':b.data.range.x.avg,
-      'y':b.data.range.y.avg
-    });
-    
-    b.LINE_WIDTH(2);
-    b.STROKE_STYLE('#fc0a');
-    b.SHOW_CES_INDIFFERENCE_CURVE({
-      'delta':0,
-      'alpha':0.5,
-      'beta':0.5,
-      'u':null,
-      'x':b.data.range.x.avg,
-      'y':b.data.range.y.avg
-    });
-
-    b.LINE_WIDTH(2);
-    b.STROKE_STYLE('#adc2eb');
-    b.SHOW_CES_INDIFFERENCE_CURVE({
-      'delta':-1,
-      'alpha':0.5,
-      'beta':0.5,
-      'u':null,
-      'x':b.data.range.x.avg,
-      'y':b.data.range.y.avg
-    });
-    
-    b.LINE_WIDTH(2);
-    b.STROKE_STYLE('#f93a');
-    b.SHOW_CES_INDIFFERENCE_CURVE({
-      'delta':-10,
-      'alpha':0.5,
-      'beta':0.5,
-      'u':null,
-      'x':b.data.range.x.avg,
-      'y':b.data.range.y.avg
-    });
-
-  }); // CLOSING window.onload
-})(); // CLOSING anon
-
 
 
 </script>
