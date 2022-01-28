@@ -15,20 +15,43 @@
 Box.prototype.GET_CES_MARSHALLIAN_ALLOCATION = function(obj) {
 
   let delta = obj.delta;
+  let delta_inv = 1/delta;
   let alpha = obj.alpha;
   let beta = obj.beta;
   let px = obj.px;
   let py = obj.py;
   let budget = obj.budget;
-
+  
+  let A = (alpha * py) / (beta * px);
+  let B = (1 / (delta - 1));
+  let C = A**B;
+  let C_INV = 1/ C;
+  
   let x = null;
   let y = null;
   let u = null;
 
+  let output = {
+    'delta':delta,
+    'alpha':alpha,
+    'beta':beta,
+    'px':px,
+    'py':py,
+    'budget':budget,
+    'A':A,
+    'B':B,
+    'C':C
+  }
+  
+  // SET THE TYPE
+  output.type = "ELSE";
+  output.delta = delta;
+  if (delta === 1) {output.type = "LINEAR"}
+  if (delta === 0) {output.type = "LOG"}
+  if (delta < -100) {output.type = "LEONTIEFF"}
 
-  if (delta === 1) {
+  if (output.type === "LINEAR") {
     
-    // LINEAR
     if (alpha/px > beta/py) {
      x = budget / px;
      y = 0;
@@ -38,38 +61,56 @@ Box.prototype.GET_CES_MARSHALLIAN_ALLOCATION = function(obj) {
      y = budget / py;
     }
     if (alpha/px === beta/py) {
-     x = 0;
-     y = 0;
+     x = 0.5 * budget / px;
+     y = 0.5 * budget / py;
     }
     u = alpha*x + beta*y;
-  } else if (delta === 0) {
+
+    output.expenditure = px*x + py*y; 
+    output.u = u;
+    output.x = x;
+    output.y = y;
+    return output;
+  }
+ 
+  if (output.type === "LOG") {
     
-    // COBB DOUGLAS
     x = alpha/(alpha + beta) * budget / px;
     y = beta/(alpha + beta) * budget / py;
     u = x**alpha*y**beta;
-  } else if (delta < -100) {
     
-    // LEONTIEFF
-    x = budget / (px + alpha / beta * py);
-    y = budget /(beta / alpha * px + py);
-    u = (x/px > y/py ) ? (y/py) : (x/px);
-  } else {
+    // i should find a way to add both log utilities, because sometimes we use cobb douglas, other times the log version
     
-    // GENERAL CES : THE ELSE CASE
-    let A = (alpha * py) / (beta * px);
-    let B = A**(1 / (delta - 1));
-    let B_INV = 1/ B;;
+    output.expenditure = px*x + py*y; 
+    output.u = u;
+    output.x = x;
+    output.y = y;
+    return output;
+  } 
   
-    x = budget / (px + py * B);
-    y = budget / (px * B_INV + py);
-    u = (alpha / delta) * x ** delta + (beta / delta) * y ** delta;
-  }
+  if (output.type === "LEONTIEFF") {
+    
+    x = budget / (px + py);
+    y = budget / (px + py);
+    u = x;
+    
+    output.expenditure = px*x + py*y; 
+    output.u = u;
+    output.x = x;
+    output.y = y;
+    return output;
+  } 
+  
 
-  return {
-    'x':x,
-    'y':y,
-    'u':u
-  };
+  // GENERAL CES : THE ELSE CASE
+  x = budget / (px + py * C);
+  y = budget / (px * C_INV + py);
+  u = (alpha * x ** delta + beta * y ** delta)**delta_inv;
+
+  output.expenditure = px*x + py*y; 
+  output.u = u;
+  output.x = x;
+  output.y = y;
+  return output;
 
 }

@@ -48,9 +48,6 @@ Box.prototype.SHOW_CES_INDIFFERENCE_CURVE = function(obj) {
     'u':null,
     'x':null,            
     'y':null,
-    'budget':null,
-    'px':null,
-    'py':null,
     'type':null
   }
 
@@ -71,7 +68,11 @@ Box.prototype.SHOW_CES_INDIFFERENCE_CURVE = function(obj) {
   output.delta = delta;
   if (delta === 1) {output.type = "LINEAR"}
   if (delta === 0) {output.type = "LOG"}
-  if (delta === -Infinity) {output.type = "LEONTIEFF"}
+  if (delta < -100) {output.type = "LEONTIEFF"}
+
+  output.alpha = alpha;
+  output.beta = beta;
+
 
 
   // FIRST CASE :
@@ -83,6 +84,9 @@ Box.prototype.SHOW_CES_INDIFFERENCE_CURVE = function(obj) {
   if (!obj.u && (obj.x && obj.y)) {
     x = obj.x;
     y = obj.y;
+    
+    output.x = x;
+    output.y = y;
     
     if (output.type === "LINEAR") {u = alpha*x + beta*y};
     if (output.type === "LOG") {u = x**alpha*y**beta};
@@ -140,7 +144,9 @@ Box.prototype.SHOW_CES_INDIFFERENCE_CURVE = function(obj) {
     
     arr.sort(function(a,b) {
       return a.x - b.x;
-    });
+    }); 
+
+    
     this.CONNECT_VALUES(arr);
     return output;
   }
@@ -157,21 +163,23 @@ Box.prototype.SHOW_CES_INDIFFERENCE_CURVE = function(obj) {
   let x_index = 0, y_index = 0;
   let arr = [];
 
-  // RELEVANT IF delta < 0
-  let x_min = 0; //((delta/alpha)*u)**delta_inv; ************************************
-  let y_min = 0; // ((delta/beta)*u)**delta_inv;
-
   for (let i = 0; i <= 50; i++) {
   
     // THE ELSE CASES
-    if (delta > 0 || (delta < 0 && x_index >= x_min)) {
+    if (u**delta > alpha*x_index**delta) {
       arr.push({
         'x':x_index,
         'y':((u**delta - alpha*x_index**delta)/beta)**delta_inv
       });
+      
+      // this.FILL_STYLE('#5d5d');
+      // this.RADIUS(3);
+      // this.SHOW_VALUE({'x':x_index,'y':((u**delta - alpha*x_index**delta)/beta)**delta_inv});
+      
+      
     }
 
-    if (delta > 0 || (delta < 0 && y_index >= y_min)) {
+    if (u**delta > beta*y_index**delta) {
       arr.push({
         'x':((u**delta - beta*y_index**delta)/alpha)**delta_inv,
         'y':y_index
@@ -191,7 +199,6 @@ Box.prototype.SHOW_CES_INDIFFERENCE_CURVE = function(obj) {
     return a.x - b.x;
   });
   // console.log(arr);
-  
   // once its sorted, it might make sense to do a while loop to remove the points at the beginning and end that are not on the grid
   
   this.CONNECT_VALUES(arr);
