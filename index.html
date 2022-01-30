@@ -9,6 +9,7 @@
   <script src='GET_CES_MARSHALLIAN_ALLOCATION.js'></script>
   <script src='SHOW_CES_INDIFFERENCE_CURVE.js'></script>
   
+  <script src='setup_basic.js'></script>
   <script src='setup_ces_idc.js'></script>
   
   <script src="./katex/katex.min.js"></script>
@@ -18,12 +19,46 @@
 </head>
 <body>
 
-<div class='section border'>
+<div class='section border margin'>
 
-<div class='box'>
+<div class='box margin padding'>
 
 <pre>
+  <span class='comment'>// SETUP</span>
+  let b = new Box();
+  let c = b.RETURN_CANVAS();
+  container.appendChild(c);
 
+  <span class='comment'>// THIS IS THE NUMBER OF PIXELS</span>
+  b.CANVAS_SIZE(500, 500);
+  
+  <span class='comment'>// SET THE RANGE</span>
+  b.RANGE_X(-1, 11);          
+  b.RANGE_Y(-1, 11);
+  
+  <span class='comment'>// UPDATES b.current</span>
+  b.ADD_CLICK();      
+  b.ADD_MOUSEMOVE();
+
+  <span class='comment'>// CLEAR THE CURRENT DRAWING</span>
+  b.CLEAR_CANVAS();
+
+  <span class='comment'>// SHOW GRIDLINES </span>
+  b.LINE_WIDTH(1);
+  b.STROKE_STYLE('#ddd');
+  b.SHOW_GRID_X();
+  b.SHOW_GRID_Y();
+
+  <span class='comment'>// DRAW THE AXIS </span>
+  b.LINE_WIDTH(2);
+  b.STROKE_STYLE('#999');
+  b.SHOW_AXES();</pre>
+
+</div>
+
+<div class='box margin padding'>
+
+<pre>
 // PIXEL : FOR THE CANVAS
 // VALUE : OUR VALUES
 // BOTTOM-LEFT IS 0-0
@@ -34,13 +69,6 @@ let pixel = VALUE2PIXEL({'x':5,'y':5});
 // RETURNS TRUE/FALSE
 b.VALUE_IN_RANGE({'x':5,'y':5});
 
-</pre>
-
-
-</div>
- 
- <div class='box'>
- <pre>
  // in hex 
  b.STROKE_STYLE('ddd');
  b.FILL_STYLE('#fc0a');
@@ -53,13 +81,13 @@ b.VALUE_IN_RANGE({'x':5,'y':5});
  </div>
 
 
-<div class='box'>
-
+<div class='box margin padding'>
 <pre>
  <span class='comment'>// DRAW A POINT</span>
  b.FILL_STYLE('#fc0a');
  b.RADIUS(3);
- b.SHOW_VALUE({'x':5,'y':5});
+ b.SHOW_VALUE(val);
+ b.POINT(val);
 
  <span class='comment'>// CONNECT POINTS</span>
  b.LINE_WIDTH(3);
@@ -68,28 +96,27 @@ b.VALUE_IN_RANGE({'x':5,'y':5});
   {'x':6,'y':6},
   {'x':7,'y':7},
   {'x':4,'y':7}
- ]);</pre>
-
-</div>
-
-<div class='box'>
-
-<pre>
- <span class='comment'>// SHOW GRIDLINES</span>
- b.LINE_WIDTH(1);
- b.STROKE_STYLE('#ddd');
- b.SHOW_GRID_X();
- b.SHOW_GRID_Y();
+ ]);
+ <span class='comment'>// b.CONNECT_POINTS();</span>
  
- <span class='comment'>// SHOW THE X-Y AXES</span>
- b.LINE_WIDTH(2);
- b.STROKE_STYLE('#999');
- b.SHOW_AXES();</pre>
+  <span class='comment'>// DRAW A RECTANGLE</span>
+  b.LINE_WIDTH(3);
+  b.STROKE_STYLE('#99b3e6');
+  b.FILL_STYLE('#d6e0f555');
+  b.RECT([
+   {'x':x,'y':y},
+   {'x':x,'y':y},
+   {'x':x,'y':y},
+   {'x':x,'y':y}
+  ]);
+ 
+ </pre>
 
 </div>
 
- <div class='box'>
- <div class='section'><h4> econ related </h4></div>
+
+ <div class='box margin padding'>
+ <h4> econ related </h4>
  <pre>
  <span class='comment'>// OPTIONAL RETURN VALUE </span>
  b.LINE_WIDTH(2);
@@ -118,48 +145,50 @@ b.VALUE_IN_RANGE({'x':5,'y':5});
 
 </div>
 
-<div class='section border'>
+<div class='section border margin'>
 
-<div class='box'>
+<div class='box margin padding'>
 
 <pre>
-let b = new Box();
-let c = b.RETURN_CANVAS();
-container.appendChild(c);
 
-b.CANVAS_SIZE(500, 500);    <span class='comment'> // this is the number of pixels </span>
-b.RANGE_X(-1, 11);          <span class='comment'> // set the range in x </span>
-b.RANGE_Y(-1, 11);          <span class='comment'> // set the range in y </span>
+  <span class='comment'>// DRAW POINTS</span>
+  b.FILL_STYLE('#fc0a');
+  b.RADIUS(2);
+  b.SHOW_VALUE({'x':3,'y':4.5});
+  b.POINT({'x':4,'y':4.0});
+  b.POINT({'x':5,'y':3.5});
 
-b.ADD_CLICK();      <span class='comment'> // updates b.current.click.value and .pixel </span>
-b.ADD_MOUSEMOVE();  <span class='comment'> // updates b.current.mousemove.value and .pixel </span>
+  <span class='comment'>// DRAW A LINE</span>
+  b.LINE_WIDTH(3);
+  b.STROKE_STYLE('#9fdfbf');
+  b.CONNECT_VALUES([
+    {'x':5,'y':9},
+    {'x':9,'y':8},
+    {'x':9,'y':7}
+  ]);
+  
+  <span class='comment'>// DRAW A RECTANGLE</span>
+  b.LINE_WIDTH(3);
+  b.STROKE_STYLE('#99b3e6');
+  b.FILL_STYLE('#d6e0f555');
+  b.RECT([
+    {'x':7,'y':3},
+    {'x':9,'y':7},
+    {'x':5,'y':9},
+    {'x':3,'y':5}
+  ]);
 
-b.CLEAR_CANVAS();
-
-<span class='comment'>// DRAW AN X-Y GRID </span>
-b.LINE_WIDTH(1);
-b.STROKE_STYLE('#ddd');
-b.SHOW_GRID_X();
-b.SHOW_GRID_Y();
-
-b.LINE_WIDTH(2);
-b.STROKE_STYLE('#999');
-b.SHOW_AXES();
-
- <span class='comment'>// DRAW A POINT </span>
- b.FILL_STYLE('#fc0a');
- b.RADIUS(3);
- b.SHOW_VALUE({'x':5,'y':5});</pre>
-
-</div>
-
-<div class='box' id='container_000'></div>
+</pre>
 
 </div>
 
-<div class='section border'>
+<div class='box margin padding' id='container_basic'></div>
 
-<div class='box'>
+</div>
+
+<div class='section border margin'>
+
+<div class='box margin padding'>
 
   <h4> graphing ces utility </h4>
   <p><span class='math'>u= \big ( \alpha \cdot x ^ {\delta} + \beta \cdot y ^ {\delta} \big ) ^ {1/{\delta}}</span></p>
@@ -186,7 +215,7 @@ b.SHOW_AXES();
  
 </div>
 
-<div class='box' id='container_ces_idc'></div>
+<div class='box margin padding' id='container_ces_idc'></div>
 
 </div>
 
@@ -194,47 +223,7 @@ b.SHOW_AXES();
 
 <script>
 
-(function() {
 
-  let b, c;
-  window.addEventListener('load', function() {
-
-    b = new Box();
-    c = b.RETURN_CANVAS();
-    container_000.appendChild(c);
-    
-    b.CANVAS_SIZE(500, 500);    // this is the number of pixels
-    b.RANGE_X(-1, 11);          // set the range in x
-    b.RANGE_Y(-1, 11);          // set the range in y 
-
-    b.ADD_CLICK();
-    b.ADD_MOUSEMOVE();
-
-    b.CLEAR_CANVAS();
-
-    b.LINE_WIDTH(1);
-    b.STROKE_STYLE('#ddd');
-    b.SHOW_GRID_X();
-    b.SHOW_GRID_Y();
-    
-    b.LINE_WIDTH(2);
-    b.STROKE_STYLE('#999');
-    b.SHOW_AXES();
-    
-    b.FILL_STYLE('#fc0a');
-    b.RADIUS(3);
-    b.SHOW_VALUE({'x':5,'y':5});
-
-    b.LINE_WIDTH(3);
-    b.STROKE_STYLE('#fcfa');
-    b.CONNECT_VALUES([
-      {'x':6,'y':5},
-      {'x':7,'y':7},
-      {'x':4,'y':8}
-    ]);
-
-  }); // CLOSING window.onload
-})(); // CLOSING anon
 
 
 </script>

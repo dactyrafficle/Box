@@ -247,9 +247,16 @@ Box.prototype.SHOW_VALUE = function(val) {
  this.ctx.beginPath();
  this.ctx.arc(p.x, p.y, r*2, 0, 2*Math.PI);
  this.ctx.fill();
-
 }
+Box.prototype.POINT = function(val) {
 
+ let p = this.VALUE2PIXEL(val);
+ let r = this.ctx.radius;
+
+ this.ctx.beginPath();
+ this.ctx.arc(p.x, p.y, r*2, 0, 2*Math.PI);
+ this.ctx.fill();
+}
 
 // let vals = [val, val,...]
 // b.LINE_WIDTH(1);
@@ -268,8 +275,38 @@ Box.prototype.CONNECT_VALUES = function(vals) {
     this.ctx.stroke();
   }
 }
+Box.prototype.CONNECT_POINTS = function(vals) {
 
+  for (let i = 0; i < vals.length-1; i++) {
 
+    let pixel_0 = this.VALUE2PIXEL(vals[i+0]);
+    let pixel_1 = this.VALUE2PIXEL(vals[i+1]);
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(pixel_0.x, pixel_0.y);
+    this.ctx.lineTo(pixel_1.x, pixel_1.y);
+    this.ctx.stroke();
+  }
+}
+// let vals = [val, val,...]
+Box.prototype.RECT = function(vals) {
+
+  let pixels = [];
+  pixels[0] = this.VALUE2PIXEL(vals[0]);
+  pixels[1] = this.VALUE2PIXEL(vals[1]);
+  pixels[2] = this.VALUE2PIXEL(vals[2]);
+  pixels[3] = this.VALUE2PIXEL(vals[3]);
+
+  this.ctx.beginPath();
+  this.ctx.moveTo(pixels[0].x, pixels[0].y);
+  this.ctx.lineTo(pixels[1].x, pixels[1].y);
+  this.ctx.lineTo(pixels[2].x, pixels[2].y);
+  this.ctx.lineTo(pixels[3].x, pixels[3].y);
+  this.ctx.lineTo(pixels[0].x, pixels[0].y);
+  this.ctx.stroke();
+  this.ctx.fill();
+
+}
 
 
 

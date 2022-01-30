@@ -5,14 +5,16 @@ html, body {
 .section {
   display: block;
   vertical-align: top;
-  margin: 1vh;
-  padding: 1vh;
 }
 .box {
   display: inline-block;
   vertical-align: top;
-  margin: 1vh;
+}
+.padding {
   padding: 1vh;
+}
+.margin {
+  margin: 1vh;
 }
 .border {
   border: 1px solid #ddd;
@@ -24,6 +26,13 @@ html, body {
   border: 1px solid #ddd;
   padding: 1vh;
 }
+.untable td {
+  border: none;
+  padding: 0;
+}
+.untable td {
+  text-align: left;
+}
 .comment {
   color: #2b2f;
 }
@@ -32,4 +41,17 @@ html, body {
 }
 pre {
   padding: 1vh;
+}
+
+.abc {
+  font-family: monospace;
+  padding: 1vh;
+}
+.inline-code {
+  font-family: monospace;
+  padding: 3px;
+  background-color: #eee;
+}
+.myoutputs {
+  text-align: center;
 }
