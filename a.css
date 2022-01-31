@@ -55,3 +55,14 @@ pre {
 .myoutputs {
   text-align: center;
 }
+
+.val {
+ padding: 1px;
+ background-color: #fd97;
+ font-weight: bold;
+}
+.vals {
+ padding: 1px;
+ background-color: #cdf7;
+ font-weight: bold;
+}

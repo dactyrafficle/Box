@@ -24,7 +24,7 @@
 <div class='box margin padding'>
 
 <pre>
-  <span class='comment'>// SETUP</span>
+  <span class='comment'>// SETUP **</span>
   let b = new Box();
   let c = b.RETURN_CANVAS();
   container.appendChild(c);
@@ -60,22 +60,22 @@
 
 <pre>
 
-let val = {
+let <span class='val'>val</span> = {
  'x':x,
  'y':y
 }
 
-let vals = []
+let <span class='vals'>vals</span> = []
 
 // PIXEL : FOR THE CANVAS
 // VALUE : OUR VALUES
 // BOTTOM-LEFT IS 0-0
 
-let value = PIXEL2VALUE({'x':5,'y':5}); 
-let pixel = VALUE2PIXEL({'x':5,'y':5});
+let val = PIXEL2VALUE(<span class='pix'>pix</span>); 
+let pix = VALUE2PIXEL(<span class='val'>val</span>);
 
 // RETURNS TRUE/FALSE
-b.VALUE_IN_RANGE({'x':5,'y':5});
+b.VALUE_IN_RANGE(<span class='val'>val</span>);
 
  // in hex 
  b.STROKE_STYLE('ddd');
@@ -95,26 +95,26 @@ b.VALUE_IN_RANGE({'x':5,'y':5});
  <span class='comment'>// DRAW A POINT</span>
  b.FILL_STYLE('#fc0a');
  b.RADIUS(3);
- b.SHOW_VALUE(<strong>val</strong>);
- b.POINT(<strong>val</strong>);
+ b.SHOW_VALUE(<span class='vals'>val</span>);
+ b.POINT(<span class='vals'>val</span>);
 
  <span class='comment'>// CONNECT POINTS</span>
  b.LINE_WIDTH(3);
  b.STROKE_STYLE('#fcfa');
- b.CONNECT_VALUES(<strong>val_arr</strong>);
- b.CONNECT_POINTS(<strong>val_arr</strong>);
+ b.CONNECT_VALUES(<span class='vals'>vals</span>);
+ b.CONNECT_POINTS(<span class='vals'>vals</span>);
  
  <span class='comment'>// DRAW A RECTANGLE</span>
  b.LINE_WIDTH(3);
  b.STROKE_STYLE('#99b3e6');
  b.FILL_STYLE('#d6e0f555');
- b.RECT(<strong>val_arr</strong>);
+ b.RECT(<span class='vals'>vals</span>);
  
  <span class='comment'>// DRAW A SHAPE</span>
  b.LINE_WIDTH(2);
  b.STROKE_STYLE('#fbfa');
  b.FILL_STYLE('#fcf5');
- b.SHAPE(<strong>val_arr</strong>);</pre>
+ b.SHAPE(<span class='vals'>vals</span>);</pre>
 
 </div>
 
@@ -233,6 +233,46 @@ b.VALUE_IN_RANGE({'x':5,'y':5});
 <div class='box margin padding' id='container_ces_idc'></div>
 
 </div>
+
+<div class='section border margin'>
+
+<div class='box margin padding'>
+
+<pre>
+(function() {
+
+  let b, c;
+  window.addEventListener('load', function() {
+
+    b = new Box();
+    c = b.RETURN_CANVAS();
+    container.appendChild(c);
+
+    b.CANVAS_SIZE(500, 500);
+    b.RANGE_X(-1, 11);          
+    b.RANGE_Y(-1, 11);
+
+    b.CLEAR_CANVAS();
+
+    // GRIDLINES 
+    b.LINE_WIDTH(1);
+    b.STROKE_STYLE('#ddd');
+    b.SHOW_GRID_X();
+    b.SHOW_GRID_Y();
+
+    // AXES 
+    b.LINE_WIDTH(2);
+    b.STROKE_STYLE('#999');
+    b.SHOW_AXES();
+  
+  }); <span class='comment'>// CLOSING window.onload </span>
+
+})(); <span class='comment'>// CLOSING anon </span></pre>
+
+</div>
+</div>
+
+
 
 </body>
 
