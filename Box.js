@@ -305,10 +305,24 @@ Box.prototype.RECT = function(vals) {
   this.ctx.lineTo(pixels[0].x, pixels[0].y);
   this.ctx.stroke();
   this.ctx.fill();
-
 }
 
+// let vals = [val, val,...]
+Box.prototype.SHAPE = function(vals) {
+  
+  let p0 = this.VALUE2PIXEL(vals[0]);
+  this.ctx.beginPath();
+  this.ctx.moveTo(p0.x, p0.y);
+    
+  for (let i = 1; i < vals.length; i++) {
+    let pixel = this.VALUE2PIXEL(vals[i]);
+    this.ctx.lineTo(pixel.x, pixel.y);
+  }
+  this.ctx.lineTo(p0.x, p0.y);
 
+  this.ctx.stroke();
+  this.ctx.fill();
+}
 
 
 

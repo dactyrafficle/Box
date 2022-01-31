@@ -51,6 +51,17 @@
       {'x':5,'y':9},
       {'x':3,'y':5}
     ]);
+    
+    // DRAW A SHAPE
+    b.LINE_WIDTH(2);
+    b.STROKE_STYLE('#fbfa');
+    b.FILL_STYLE('#fcf5');
+    b.SHAPE([
+      {'x':1,'y':8},
+      {'x':2,'y':10},
+      {'x':4,'y':9},
+      {'x':2,'y':5}
+    ]);
 
   }); // CLOSING window.onload
 })(); // CLOSING anon

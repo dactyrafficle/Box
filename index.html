@@ -59,6 +59,14 @@
 <div class='box margin padding'>
 
 <pre>
+
+let val = {
+ 'x':x,
+ 'y':y
+}
+
+let vals = []
+
 // PIXEL : FOR THE CANVAS
 // VALUE : OUR VALUES
 // BOTTOM-LEFT IS 0-0
@@ -82,35 +90,31 @@ b.VALUE_IN_RANGE({'x':5,'y':5});
 
 
 <div class='box margin padding'>
+
 <pre>
  <span class='comment'>// DRAW A POINT</span>
  b.FILL_STYLE('#fc0a');
  b.RADIUS(3);
- b.SHOW_VALUE(val);
- b.POINT(val);
+ b.SHOW_VALUE(<strong>val</strong>);
+ b.POINT(<strong>val</strong>);
 
  <span class='comment'>// CONNECT POINTS</span>
  b.LINE_WIDTH(3);
  b.STROKE_STYLE('#fcfa');
- b.CONNECT_VALUES([
-  {'x':6,'y':6},
-  {'x':7,'y':7},
-  {'x':4,'y':7}
- ]);
- <span class='comment'>// b.CONNECT_POINTS();</span>
+ b.CONNECT_VALUES(<strong>val_arr</strong>);
+ b.CONNECT_POINTS(<strong>val_arr</strong>);
  
-  <span class='comment'>// DRAW A RECTANGLE</span>
-  b.LINE_WIDTH(3);
-  b.STROKE_STYLE('#99b3e6');
-  b.FILL_STYLE('#d6e0f555');
-  b.RECT([
-   {'x':x,'y':y},
-   {'x':x,'y':y},
-   {'x':x,'y':y},
-   {'x':x,'y':y}
-  ]);
+ <span class='comment'>// DRAW A RECTANGLE</span>
+ b.LINE_WIDTH(3);
+ b.STROKE_STYLE('#99b3e6');
+ b.FILL_STYLE('#d6e0f555');
+ b.RECT(<strong>val_arr</strong>);
  
- </pre>
+ <span class='comment'>// DRAW A SHAPE</span>
+ b.LINE_WIDTH(2);
+ b.STROKE_STYLE('#fbfa');
+ b.FILL_STYLE('#fcf5');
+ b.SHAPE(<strong>val_arr</strong>);</pre>
 
 </div>
 
@@ -176,6 +180,17 @@ b.VALUE_IN_RANGE({'x':5,'y':5});
     {'x':9,'y':7},
     {'x':5,'y':9},
     {'x':3,'y':5}
+  ]);
+  
+  <span class='comment'>// DRAW A SHAPE</span>
+  b.LINE_WIDTH(2);
+  b.STROKE_STYLE('#fbfa');
+  b.FILL_STYLE('#fcf5');
+  b.SHAPE([
+    {'x':1,'y':8},
+    {'x':2,'y':10},
+    {'x':4,'y':9},
+    {'x':2,'y':5}
   ]);
 
 </pre>
