@@ -157,9 +157,13 @@ Box.prototype.RADIUS = function(rx) {
   this.ctx.radius = rx;
 }
 
-Box.prototype.SHOW_GRID_X = function() {
+Box.prototype.SHOW_GRID_X = function(dx_) {
 
   let dx = 1;
+  if (arguments[0]) {
+    dx = dx_;
+  }
+
   let x_start = Math.floor(this.data.range.x.min/dx)*dx;
   
   let y0 = this.data.range.y.min;
@@ -181,9 +185,13 @@ Box.prototype.SHOW_GRID_X = function() {
 };
 
 
-Box.prototype.SHOW_GRID_Y = function() {
+Box.prototype.SHOW_GRID_Y = function(dy_) {
 
   let dy = 1;
+  if (arguments[0]) {
+    dy = dy_;
+  }
+  
   let y_start = Math.floor(this.data.range.y.min/dy)*dy;
   
   let x0 = this.data.range.x.min;
