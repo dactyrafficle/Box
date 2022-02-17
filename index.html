@@ -1,30 +1,37 @@
+
 <!DOCTYPE html>
 <html>
 <head>
 
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title> BOX </title>
-  <link rel="stylesheet" href="a.css">
-  <link rel="icon" href="a.png">
-  <script src='Box.js'></script>
-  <script src='GET_CES_MARSHALLIAN_ALLOCATION.js'></script>
-  <script src='SHOW_CES_INDIFFERENCE_CURVE.js'></script>
   
-  <script src='setup_basic.js'></script>
-  <script src='setup_ces_idc.js'></script>
+  <link rel="icon" href="./a.png">
+  <link rel="stylesheet" href="./a.css">
+  <script src="./a.js"></script>
   
+  <script src='./Box.js'></script>
+
+  <script src='./setup_basic.js'></script>
+  <script src='./setup_ces_idc.js'></script>
+  <script src='./setup_gear.js'></script>
+
   <script src="./katex/katex.min.js"></script>
   <link rel="stylesheet" href="./katex/katex.min.css" >
-  <script src="./a.js"></script>
 
 </head>
+
 <body>
 
-<div class='section border margin'>
+
+  <div class='section border margin padding'>
 
 <div class='box margin padding'>
 
 <pre>
-  <span class='comment'>// SETUP **</span>
+  <span class='comment'>// SETUP </span>
   let b = new Box();
   let c = b.RETURN_CANVAS();
   container.appendChild(c);
@@ -91,12 +98,22 @@ b.VALUE_IN_RANGE(<span class='val'>val</span>);
 
 <div class='box margin padding'>
 
+  <h4> shapes </h4>
+
+ <ul>
+  <li><pre>b.POINT()</pre>
+  <li><pre>b.CONNECT_POINTS()</pre>
+  <li><pre>b.RECT()</pre>
+  <li><pre>b.SHAPE()</pre>
+  <li><pre>b.CIRCLE()</pre>
+ </ul>
+
 <pre>
  <span class='comment'>// DRAW A POINT</span>
  b.FILL_STYLE('#fc0a');
  b.RADIUS(3);
- b.SHOW_VALUE(<span class='vals'>val</span>);
- b.POINT(<span class='vals'>val</span>);
+ b.SHOW_VALUE(<span class='val'>val</span>);
+ b.POINT(<span class='val'>val</span>);
 
  <span class='comment'>// CONNECT POINTS</span>
  b.LINE_WIDTH(3);
@@ -114,13 +131,27 @@ b.VALUE_IN_RANGE(<span class='val'>val</span>);
  b.LINE_WIDTH(2);
  b.STROKE_STYLE('#fbfa');
  b.FILL_STYLE('#fcf5');
- b.SHAPE(<span class='vals'>vals</span>);</pre>
+ b.SHAPE(<span class='vals'>vals</span>);
+ 
+ <span class='comment'>// DRAW A CIRCLE</span>
+ b.CIRCLE({
+  'val':<span class='val'>val</span>,
+  'r':3,
+  'line_width':null,
+  'stroke_style':null,
+  'fill_style':null
+ });</pre>
 
 </div>
 
 
  <div class='box margin padding'>
  <h4> econ related </h4>
+ <ul>
+  <li><p>b.SHOW_CES_INDIFFERENCE_CURVE()</p>
+  <li><p>b.GET_CES_MARSHALLIAN_ALLOCATION()</p>
+ </ul>
+ 
  <pre>
  <span class='comment'>// OPTIONAL RETURN VALUE </span>
  b.LINE_WIDTH(2);
@@ -146,19 +177,14 @@ b.VALUE_IN_RANGE(<span class='val'>val</span>);
  </pre>
  
  </div>
-
-</div>
-
-<div class='section border margin'>
+ </div> <!-- closing general -->  <div class='section border margin padding'>
 
 <div class='box margin padding'>
 
-<pre>
-
-  <span class='comment'>// DRAW POINTS</span>
+  <pre>  <span class='comment'>// DRAW POINTS</span>
   b.FILL_STYLE('#fc0a');
   b.RADIUS(2);
-  b.SHOW_VALUE({'x':3,'y':4.5});
+  b.POINT({'x':3,'y':4.5});
   b.POINT({'x':4,'y':4.0});
   b.POINT({'x':5,'y':3.5});
 
@@ -171,7 +197,7 @@ b.VALUE_IN_RANGE(<span class='val'>val</span>);
     {'x':9,'y':7}
   ]);
   
-  <span class='comment'>// DRAW A RECTANGLE</span>
+  <span class='comment'>  // DRAW A RECTANGLE</span>
   b.LINE_WIDTH(3);
   b.STROKE_STYLE('#99b3e6');
   b.FILL_STYLE('#d6e0f555');
@@ -180,9 +206,12 @@ b.VALUE_IN_RANGE(<span class='val'>val</span>);
     {'x':9,'y':7},
     {'x':5,'y':9},
     {'x':3,'y':5}
-  ]);
+  ]);</pre></div>
   
-  <span class='comment'>// DRAW A SHAPE</span>
+
+<div class='box margin padding'>
+
+  <pre>  <span class='comment'>// DRAW A SHAPE</span>
   b.LINE_WIDTH(2);
   b.STROKE_STYLE('#fbfa');
   b.FILL_STYLE('#fcf5');
@@ -192,18 +221,23 @@ b.VALUE_IN_RANGE(<span class='val'>val</span>);
     {'x':4,'y':9},
     {'x':2,'y':5}
   ]);
+  
+  <span class='comment'>// DRAW A CIRCLE</span>
+  b.CIRCLE({
+    'val':{'x':0,'y':0},
+    'r':3,
+    'line_width':2,
+    'stroke_style':'#58da',
+    'fill_style':null
+  });</pre>
 
-</pre>
-
-</div>
+</pre></div>
 
 <div class='box margin padding' id='container_basic'></div>
 
-</div>
-
-<div class='section border margin'>
-
-<div class='box margin padding'>
+</div> <!-- closing basic -->  <div class='section border margin padding'>
+  
+  <div class='box margin padding'>
 
   <h4> graphing ces utility </h4>
   <p><span class='math'>u= \big ( \alpha \cdot x ^ {\delta} + \beta \cdot y ^ {\delta} \big ) ^ {1/{\delta}}</span></p>
@@ -232,9 +266,69 @@ b.VALUE_IN_RANGE(<span class='val'>val</span>);
 
 <div class='box margin padding' id='container_ces_idc'></div>
 
+</div> <!-- closing econ -->  <div class='section border margin padding'>
+
+<div class='box'>
+
+<p> in this case, theres a gear object </p>
+<p> val, n, r_inner are required </p>
+<p> omega is angular velocity </p>
+<p> theta is the original theta </p>
+<p> d_theta is angular displacement </p>
+<p> g.update() adds the velocity to d_theta </p>
+<p> but the gear is drawn by b, the box object </p>
+<p style='border-bottom: 1px solid #ddd'></p>
+<p> there are n teeth </p>
+<p> imagine a circle sliced into n slices </p>
+<p> each slice creates an angle theta_tranche </p>
+<p> the depth of the teeth depends on r_outer </p>
+
 </div>
 
-<div class='section border margin'>
+<div class='box'>
+
+  <pre class='code'>
+  <span class='comment'>// THE MINIMAL GEAR </span>
+  g[0] = new Gear({
+    'val':{'x':6,'y':6},
+    'n':23,
+    'r_inner':3
+  });
+  b.GEAR(g[0]);</pre>
+
+  <pre class='code'>
+  <span class='comment'>// A FEW MORE DETAILS </span>
+  g[1] = new Gear({
+    'val':{'x':1,'y':1},
+    'n':23,
+    'r_inner':5,
+    'r_outer':null,
+    'theta':null,
+    'd_theta':null,
+    'omega':null,
+    'line_width':2,
+    'stroke_style':'#58da',
+    'fill_style':null
+  });
+  b.GEAR(g);</pre>
+    
+  <pre class='code'>
+  <span class='comment'>// TO ANIMATE IT </span>
+  window.setInterval(function(){
+
+    <span class='comment'>// ...CLEAR CANVAS, GRID LINES, ETC </span>
+    
+    <span class='comment'>// INCREMENT THE ANGULAR DISPLACEMENT </span>
+    g[1].update();
+    
+    b.GEAR(g[0]);
+    b.GEAR(g[1]);
+  }, 1000/30);</pre></div>
+  
+  
+<div class='box margin padding' id='container_special'></div>
+
+</div> <!-- closing gear -->  <div class='section border margin padding'>
 
 <div class='box margin padding'>
 
@@ -270,16 +364,10 @@ b.VALUE_IN_RANGE(<span class='val'>val</span>);
 })(); <span class='comment'>// CLOSING anon </span></pre>
 
 </div>
-</div>
 
-
-
+</div> <!-- closing setup -->
 </body>
 
-<script>
+<script></script>
 
-
-
-
-</script>
 </html>

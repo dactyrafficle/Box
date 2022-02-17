@@ -62,6 +62,16 @@
       {'x':4,'y':9},
       {'x':2,'y':5}
     ]);
+    
+    // DRAW A CIRCLE
+    b.CIRCLE({
+      'val':{'x':0,'y':0},
+      'r':3,
+      'line_width':2,
+      'stroke_style':'#58da',
+      'fill_style':null
+    });
+
 
   }); // CLOSING window.onload
 })(); // CLOSING anon

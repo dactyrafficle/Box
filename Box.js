@@ -1,16 +1,14 @@
-
+/* LAST UPDATED : 2022-02-17-1830 EST */
+
 /*
 
 let b = new Box();
 let c = b.RETURN_CANVAS();
 container.appendChild(c);
 
-b.CANVAS_SIZE(500, 500);     // this is the number of pixels 
-b.RANGE_X(-1, 11);           // set the range in x 
-b.RANGE_Y(-1, 11);           // set the range in y 
-
-b.ADD_CLICK();       // updates b.current.click.value and .pixel 
-b.ADD_MOUSEMOVE();   // updates b.current.mousemove.value and .pixel 
+b.CANVAS_SIZE(500, 500);     SETS THE DIMENSIONS OF THE CANVAS IN PIXELS
+b.RANGE_X(-1, 11);           SETS THE DIMENSIONS OF THE X AXIS IN UNITS
+b.RANGE_Y(-1, 11);           SETS THE DIMENSIONS OF THE Y AXIS IN UNITS
 
 */
 
@@ -19,7 +17,6 @@ function Box() {
   this.c = document.createElement('canvas');
   this.ctx = this.c.getContext('2d');
   
-  // STRUCTURE
   this.data = {
     'dimension':{
       'w':100,
@@ -59,8 +56,7 @@ function Box() {
       'pixel':null
     }
   }
-     
-  // DEFAULTS
+
   this.RANGE_X(0, 100);
   this.RANGE_Y(0, 100);
   this.CANVAS_SIZE(100, 100);
@@ -68,19 +64,7 @@ function Box() {
   this.ctx.radius = 3;
 }
 
-
-
-Box.prototype.RETURN_CANVAS = function() {
-  return this.c;
-}
-
-Box.prototype.CLEAR_CANVAS = function() {
-  this.ctx.fillStyle = '#fff';
-  this.ctx.beginPath();
-  this.ctx.rect(0, 0, this.data.dimension.w, this.data.dimension.h);
-  this.ctx.fill();
-}
-
+
 Box.prototype.ADD_CLICK = function() {
   this.c.addEventListener('click', function(e) {
     let pixel = {'x':e.offsetX,'y':e.offsetY};
@@ -88,8 +72,9 @@ Box.prototype.ADD_CLICK = function() {
     this.current.click.value = value;
     this.current.click.pixel = pixel;
   }.bind(this));
-}
+};
 
+
 Box.prototype.ADD_MOUSEMOVE = function() {
   this.c.addEventListener('mousemove', function(e) {
     let pixel = {'x':e.offsetX,'y':e.offsetY};
@@ -97,121 +82,9 @@ Box.prototype.ADD_MOUSEMOVE = function() {
     this.current.mousemove.value = value;
     this.current.mousemove.pixel = pixel;
   }.bind(this));
-}
-
-Box.prototype.RANGE_X = function(min, max) {
-  this.data.range.x.min = min;
-  this.data.range.x.max = max;
-  this.data.range.x.avg = (max + min) / 2;
-  this.data.range.x.span = max - min;
-  this.data.zoom.x = this.data.dimension.w / this.data.range.x.span;
-  this.data.translate.x = -this.data.range.x.min;
-}
-
-Box.prototype.RANGE_Y = function(min, max) {
-  this.data.range.y.min = min;
-  this.data.range.y.max = max;
-  this.data.range.y.avg = (max + min) / 2;
-  this.data.range.y.span = max - min;
-  this.data.zoom.y = this.data.dimension.h / this.data.range.y.span;
-  this.data.translate.y = -this.data.range.y.min;
-}
-
-Box.prototype.CANVAS_SIZE = function(w, h) {
-  this.data.dimension.w = w;
-  this.data.dimension.h = h; 
-  this.c.width = this.data.dimension.w;
-  this.c.height = this.data.dimension.h;
- 
-  // RESET ZOOM AND XLATE BY REAPPLYING THE RANGES
-  this.RANGE_X(this.data.range.x.min, this.data.range.x.max);
-  this.RANGE_Y(this.data.range.y.min, this.data.range.y.max);
-}
-
-Box.prototype.VALUE2PIXEL = function(val) {  // val : (0,0) is bottom-left (Cartesian)
- return {
-  'x':(val.x+this.data.translate.x)*this.data.zoom.x,
-  'y':this.data.dimension.h - (val.y+this.data.translate.y)*this.data.zoom.y
- }
-}
-
-Box.prototype.PIXEL2VALUE = function(pixel) { // pixel : (0,0) is top-left (standard computer/matrix grid)
- return {
-  'x':(pixel.x/this.data.zoom.x)-this.data.translate.x,
-  'y':(this.data.dimension.h-pixel.y)/this.data.zoom.y-this.data.translate.y
- }
-}
-
-Box.prototype.STROKE_STYLE = function(x) {
-  this.ctx.strokeStyle = x; 
-}
-
-Box.prototype.FILL_STYLE = function(x) {
-  this.ctx.fillStyle = x; 
-}
-
-Box.prototype.LINE_WIDTH = function(x) {
-  this.ctx.lineWidth = x; 
-}
-Box.prototype.RADIUS = function(rx) {
-  this.ctx.radius = rx;
-}
-
-Box.prototype.SHOW_GRID_X = function(dx_) {
-
-  let dx = 1;
-  if (arguments[0]) {
-    dx = dx_;
-  }
-
-  let x_start = Math.floor(this.data.range.x.min/dx)*dx;
-  
-  let y0 = this.data.range.y.min;
-  let y1 = this.data.range.y.max;
-
-  for (let x = x_start; x <= this.data.range.x.max; x += dx) {
-
-    let v0 = {'x':x,'y':y0};
-    let v1 = {'x':x,'y':y1};
-
-    let p0 = this.VALUE2PIXEL(v0);
-    let p1 = this.VALUE2PIXEL(v1);
-    
-    this.ctx.beginPath();
-    this.ctx.moveTo(p0.x, p0.y);
-    this.ctx.lineTo(p1.x, p1.y);
-    this.ctx.stroke();   
-  }
 };
 
-
-Box.prototype.SHOW_GRID_Y = function(dy_) {
-
-  let dy = 1;
-  if (arguments[0]) {
-    dy = dy_;
-  }
-  
-  let y_start = Math.floor(this.data.range.y.min/dy)*dy;
-  
-  let x0 = this.data.range.x.min;
-  let x1 = this.data.range.x.max;
-
-  for (let y = y_start; y <= this.data.range.y.max; y += dy) {
-
-    let v0 = {'x':x0,'y':y};
-    let v1 = {'x':x1,'y':y};
-
-    let p0 = this.VALUE2PIXEL(v0);
-    let p1 = this.VALUE2PIXEL(v1);
-    
-    this.ctx.beginPath();
-    this.ctx.moveTo(p0.x, p0.y);
-    this.ctx.lineTo(p1.x, p1.y);
-    this.ctx.stroke();   
-  }
-};
-
+
 Box.prototype.SHOW_AXES = function() {
   
   this.CONNECT_VALUES([
@@ -226,278 +99,6 @@ Box.prototype.SHOW_AXES = function() {
   
 }
 
-
-// val = {'x':x,'y':y}
-Box.prototype.VALUE_IN_RANGE = function(val) {
-
-  let x = val.x;
-  let y = val.y;
-  let x_min = this.data.range.x.min;
-  let x_max = this.data.range.x.max; 
-  let y_min = this.data.range.y.min;
-  let y_max = this.data.range.y.max;
-  
-  if (x >= x_min && x <= x_max && y >= y_min && y <= y_max) {
-    return true;
-  } else {
-    return false;
-  }
-
-}
-
-// val = {'x':x,'y':y}
-// this.RADIUS(rx)
-Box.prototype.SHOW_VALUE = function(val) {
-
- let p = this.VALUE2PIXEL(val);
- let r = this.ctx.radius;
-
- this.ctx.beginPath();
- this.ctx.arc(p.x, p.y, r*2, 0, 2*Math.PI);
- this.ctx.fill();
-}
-Box.prototype.POINT = function(val) {
-
- let p = this.VALUE2PIXEL(val);
- let r = this.ctx.radius;
-
- this.ctx.beginPath();
- this.ctx.arc(p.x, p.y, r*2, 0, 2*Math.PI);
- this.ctx.fill();
-}
-
-// let vals = [val, val,...]
-// b.LINE_WIDTH(1);
-// b.STROKE_STYLE('#ddd');
-
-Box.prototype.CONNECT_VALUES = function(vals) {
-
-  for (let i = 0; i < vals.length-1; i++) {
-
-    let pixel_0 = this.VALUE2PIXEL(vals[i+0]);
-    let pixel_1 = this.VALUE2PIXEL(vals[i+1]);
-
-    this.ctx.beginPath();
-    this.ctx.moveTo(pixel_0.x, pixel_0.y);
-    this.ctx.lineTo(pixel_1.x, pixel_1.y);
-    this.ctx.stroke();
-  }
-}
-Box.prototype.CONNECT_POINTS = function(vals) {
-
-  for (let i = 0; i < vals.length-1; i++) {
-
-    let pixel_0 = this.VALUE2PIXEL(vals[i+0]);
-    let pixel_1 = this.VALUE2PIXEL(vals[i+1]);
-
-    this.ctx.beginPath();
-    this.ctx.moveTo(pixel_0.x, pixel_0.y);
-    this.ctx.lineTo(pixel_1.x, pixel_1.y);
-    this.ctx.stroke();
-  }
-}
-// let vals = [val, val,...]
-Box.prototype.RECT = function(vals) {
-
-  let pixels = [];
-  pixels[0] = this.VALUE2PIXEL(vals[0]);
-  pixels[1] = this.VALUE2PIXEL(vals[1]);
-  pixels[2] = this.VALUE2PIXEL(vals[2]);
-  pixels[3] = this.VALUE2PIXEL(vals[3]);
-
-  this.ctx.beginPath();
-  this.ctx.moveTo(pixels[0].x, pixels[0].y);
-  this.ctx.lineTo(pixels[1].x, pixels[1].y);
-  this.ctx.lineTo(pixels[2].x, pixels[2].y);
-  this.ctx.lineTo(pixels[3].x, pixels[3].y);
-  this.ctx.lineTo(pixels[0].x, pixels[0].y);
-  this.ctx.stroke();
-  this.ctx.fill();
-}
-
-// let vals = [val, val,...]
-Box.prototype.SHAPE = function(vals) {
-  
-  let p0 = this.VALUE2PIXEL(vals[0]);
-  this.ctx.beginPath();
-  this.ctx.moveTo(p0.x, p0.y);
-    
-  for (let i = 1; i < vals.length; i++) {
-    let pixel = this.VALUE2PIXEL(vals[i]);
-    this.ctx.lineTo(pixel.x, pixel.y);
-  }
-  this.ctx.lineTo(p0.x, p0.y);
-
-  this.ctx.stroke();
-  this.ctx.fill();
-}
-
-
-
-
-/*
-
-Box.prototype.SHOW_GRID_Y = function(dy, color_string) {
-
- if (!arguments[0]) {
-  dy = 1;
- }
- let zoom = this.data.zoom.x;
-
- let alpha_1 = 1;
- let alpha_10 = -1+(1/200)*zoom;
- let color_string_1 = 'rgba(208, 208, 208,' + alpha_1 + ')';
- let color_string_10 = 'rgba(224, 224, 224,' + alpha_10 + ')';
- 
- let y_start = Math.floor(this.data.range.y.min/dy)*dy;
- 
- let i = 0; // BC FLOATING PT NUMBERS MAKE TESTING y%dy TOUGH
- for (let y = y_start; y < this.data.range.y.max; y += dy/10) {
-  if (i%10===0) {
-   let val0 = {'x':this.data.range.x.min,'y':y};
-   let val1 = {'x':this.data.range.x.max,'y':y};
-   this.CONNECTVALUES(val0, val1, color_string_1);
-  }
-
-   let val0 = {'x':this.data.range.x.min,'y':y};
-   let val1 = {'x':this.data.range.x.max,'y':y};
-  this.CONNECTVALUES(val0, val1, color_string_10);
-  i++;
- }
-};
-*/
-Box.prototype.SHOW_FLOATING_LOG_Y_AXIS = function(n) {
-
- let sh = this.data.dimension.h/n;
- let sw = this.data.dimension.w/n;
- 
- let n1 = 2;
- let n2 = n-n1;
- 
- let p0 = {'x':sw,'y':sh*n1};
- let p1 = {'x':sw,'y':sh*n2};
-
- let v0 = this.PIXEL2VALUE(p0);
- let v1 = this.PIXEL2VALUE(p1);
- 
- this.CONNECTVALUES(v0, v1, '#333', 0.5);
- 
- let dsw = 5;
- for (let i = n1; i <= n2; i++) {
-  let p0 = {'x':sw-dsw,'y':sh*i};
-  let p1 = {'x':sw+dsw,'y':sh*i};
-  let v0 = this.PIXEL2VALUE(p0);
-  let v1 = this.PIXEL2VALUE(p1);
-  this.ctx.fillStyle = '#333';
-  this.ctx.textAlign = 'left';
-  this.ctx.textBaseline = 'middle';
-  this.ctx.fillText((v0.y).toFixed(2), p0.x+2*dsw, p0.y);
-  this.ctx.stroke();
-  this.CONNECTVALUES(v0, v1, '#333', 0.5); 
- }
- 
- this.ctx.textAlign = 'center';
- this.ctx.textBaseline = 'top';
- this.ctx.fillText((this.data.label.y), sw, sh*(n2+0.25));
-};
-Box.prototype.SHOW_FLOATING_Y_AXIS = function(n) {
-
- let sh = this.data.dimension.h/n;
- let sw = this.data.dimension.w/n;
- 
- let n1 = 2;
- let n2 = n-n1;
- 
- let p0 = {'x':sw,'y':sh*n1};
- let p1 = {'x':sw,'y':sh*n2};
-
- let v0 = this.PIXEL2VALUE(p0);
- let v1 = this.PIXEL2VALUE(p1);
- 
- this.CONNECTVALUES(v0, v1, '#333', 0.5);
- 
- let dsw = 5;
- for (let i = n1; i <= n2; i++) {
-  let p0 = {'x':sw-dsw,'y':sh*i};
-  let p1 = {'x':sw+dsw,'y':sh*i};
-  let v0 = this.PIXEL2VALUE(p0);
-  let v1 = this.PIXEL2VALUE(p1);
-  this.ctx.fillStyle = '#333';
-  this.ctx.textAlign = 'left';
-  this.ctx.textBaseline = 'middle';
-  this.ctx.fillText((v0.y).toFixed(0), p0.x+2*dsw, p0.y);
-  this.ctx.stroke();
-  this.CONNECTVALUES(v0, v1, '#333', 0.5); 
- }
- 
- this.ctx.textAlign = 'center';
- this.ctx.textBaseline = 'top';
- this.ctx.fillText((this.data.label.y), sw, sh*(n2+0.25));
-};
-Box.prototype.SHOW_FLOATING_LOG_X_AXIS = function(obj) {
-
-  
-  let x_0 = this.data.dimension.w/5;
-  let x_1 = this.data.dimension.w - x_0;
-  let y = this.data.dimension.h*4.25/5;
-  
-  let val_0 = this.PIXEL2VALUE({'x':x_0,'y':y});
-  let val_1 = this.PIXEL2VALUE({'x':x_1,'y':y});
-  
-  this.CONNECT_VALUES({
-    'vals':[val_0, val_1]
-  })
-
-
-
-  
-};
-
-Box.prototype.SHOW_FLOATING_X_AXIS = function(n, y_val) {
-
- //let n = 9;
- let sh;
- if (arguments[1] !== null) {
-   let v3 = {'x':0,'y':y_val};
-   //console.log(v3);
-   let p3 = this.VALUE2PIXEL(v3);
-   //console.log(p3);
-   sh = p3.y;
- } else {
-  sh = this.data.dimension.h - this.data.dimension.h/n;
- }
- let sw = this.data.dimension.w/n;
- 
- let n1 = 1;
- let n2 = n-n1;
- 
- let p0 = {'x':sw*n1,'y':sh};
- let p1 = {'x':sw*n2,'y':sh};
-
- let v0 = this.PIXEL2VALUE(p0);
- let v1 = this.PIXEL2VALUE(p1);
- 
- this.CONNECTVALUES(v0, v1, '#333', 0.5);
-
- let dsh = 5;
- for (let i = n1; i <= n2; i++) {
-  let p0 = {'x':sw*i,'y':sh+dsh};
-  let p1 = {'x':sw*i,'y':sh-dsh};
-  let v0 = this.PIXEL2VALUE(p0);
-  let v1 = this.PIXEL2VALUE(p1);
-  this.ctx.fillStyle = '#333';
-  this.ctx.textAlign = 'center';
-  this.ctx.textBaseline = 'top';
-  this.ctx.fillText(v0.x.toFixed(0), p0.x, p0.y+1*dsh);
-  this.ctx.stroke();
-  this.CONNECTVALUES(v0, v1, '#333', 0.5); 
- }
-
- this.ctx.textAlign = 'right';
- this.ctx.textBaseline = 'middle';
- this.ctx.fillText((this.data.label.x).toUpperCase(), sw*(n1-0.25), sh);
-
-};
 
 Box.prototype.showAxes = function(fontSize) {
 
@@ -557,77 +158,493 @@ Box.prototype.showAxes = function(fontSize) {
  
 }
 
-Box.prototype.SHOWVALUE = function(val, colorstring, rx) {
 
- let pixel = this.VALUE2PIXEL(val);
- this.ctx.fillStyle = colorstring;
- this.ctx.beginPath();
- this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
- this.ctx.fill();
+Box.prototype.SHOW_FLOATING_X_AXIS = function(n, y_val) {
 
+ //let n = 9;
+ let sh;
+ if (arguments[1] !== null) {
+   let v3 = {'x':0,'y':y_val};
+   //console.log(v3);
+   let p3 = this.VALUE2PIXEL(v3);
+   //console.log(p3);
+   sh = p3.y;
+ } else {
+  sh = this.data.dimension.h - this.data.dimension.h/n;
+ }
+ let sw = this.data.dimension.w/n;
+ 
+ let n1 = 1;
+ let n2 = n-n1;
+ 
+ let p0 = {'x':sw*n1,'y':sh};
+ let p1 = {'x':sw*n2,'y':sh};
+
+ let v0 = this.PIXEL2VALUE(p0);
+ let v1 = this.PIXEL2VALUE(p1);
+ 
+ this.CONNECTVALUES(v0, v1, '#333', 0.5);
+
+ let dsh = 5;
+ for (let i = n1; i <= n2; i++) {
+  let p0 = {'x':sw*i,'y':sh+dsh};
+  let p1 = {'x':sw*i,'y':sh-dsh};
+  let v0 = this.PIXEL2VALUE(p0);
+  let v1 = this.PIXEL2VALUE(p1);
+  this.ctx.fillStyle = '#333';
+  this.ctx.textAlign = 'center';
+  this.ctx.textBaseline = 'top';
+  this.ctx.fillText(v0.x.toFixed(0), p0.x, p0.y+1*dsh);
+  this.ctx.stroke();
+  this.CONNECTVALUES(v0, v1, '#333', 0.5); 
+ }
+
+ this.ctx.textAlign = 'right';
+ this.ctx.textBaseline = 'middle';
+ this.ctx.fillText((this.data.label.x).toUpperCase(), sw*(n1-0.25), sh);
+
+};
+
+Box.prototype.SHOW_FLOATING_Y_AXIS = function(n) {
+
+ let sh = this.data.dimension.h/n;
+ let sw = this.data.dimension.w/n;
+ 
+ let n1 = 2;
+ let n2 = n-n1;
+ 
+ let p0 = {'x':sw,'y':sh*n1};
+ let p1 = {'x':sw,'y':sh*n2};
+
+ let v0 = this.PIXEL2VALUE(p0);
+ let v1 = this.PIXEL2VALUE(p1);
+ 
+ this.CONNECTVALUES(v0, v1, '#333', 0.5);
+ 
+ let dsw = 5;
+ for (let i = n1; i <= n2; i++) {
+  let p0 = {'x':sw-dsw,'y':sh*i};
+  let p1 = {'x':sw+dsw,'y':sh*i};
+  let v0 = this.PIXEL2VALUE(p0);
+  let v1 = this.PIXEL2VALUE(p1);
+  this.ctx.fillStyle = '#333';
+  this.ctx.textAlign = 'left';
+  this.ctx.textBaseline = 'middle';
+  this.ctx.fillText((v0.y).toFixed(0), p0.x+2*dsw, p0.y);
+  this.ctx.stroke();
+  this.CONNECTVALUES(v0, v1, '#333', 0.5); 
+ }
+ 
+ this.ctx.textAlign = 'center';
+ this.ctx.textBaseline = 'top';
+ this.ctx.fillText((this.data.label.y), sw, sh*(n2+0.25));
+};
+Box.prototype.SHOW_FLOATING_LOG_X_AXIS = function(obj) {
+
+  
+  let x_0 = this.data.dimension.w/5;
+  let x_1 = this.data.dimension.w - x_0;
+  let y = this.data.dimension.h*4.25/5;
+  
+  let val_0 = this.PIXEL2VALUE({'x':x_0,'y':y});
+  let val_1 = this.PIXEL2VALUE({'x':x_1,'y':y});
+  
+  this.CONNECT_VALUES({
+    'vals':[val_0, val_1]
+  })
+
+
+
+  
+};
+
+
+
+Box.prototype.SHOW_FLOATING_LOG_Y_AXIS = function(n) {
+
+ let sh = this.data.dimension.h/n;
+ let sw = this.data.dimension.w/n;
+ 
+ let n1 = 2;
+ let n2 = n-n1;
+ 
+ let p0 = {'x':sw,'y':sh*n1};
+ let p1 = {'x':sw,'y':sh*n2};
+
+ let v0 = this.PIXEL2VALUE(p0);
+ let v1 = this.PIXEL2VALUE(p1);
+ 
+ this.CONNECTVALUES(v0, v1, '#333', 0.5);
+ 
+ let dsw = 5;
+ for (let i = n1; i <= n2; i++) {
+  let p0 = {'x':sw-dsw,'y':sh*i};
+  let p1 = {'x':sw+dsw,'y':sh*i};
+  let v0 = this.PIXEL2VALUE(p0);
+  let v1 = this.PIXEL2VALUE(p1);
+  this.ctx.fillStyle = '#333';
+  this.ctx.textAlign = 'left';
+  this.ctx.textBaseline = 'middle';
+  this.ctx.fillText((v0.y).toFixed(2), p0.x+2*dsw, p0.y);
+  this.ctx.stroke();
+  this.CONNECTVALUES(v0, v1, '#333', 0.5); 
+ }
+ 
+ this.ctx.textAlign = 'center';
+ this.ctx.textBaseline = 'top';
+ this.ctx.fillText((this.data.label.y), sw, sh*(n2+0.25));
+};
+function abc(x, arr) {
+
+ if (arr[0] === 'get') {
+   if (arr[1] === 'x') {
+     return x;
+   } else {
+     return eval(arr[1]);        /* why do ppl hate eval so much? why should i not use it? */
+   }
+ }
+ if (arr%arr===0) {
+   return arr;
+ }
+ 
+ if (arr[0] === '**') {
+   return abc(x, arr[1])**abc(x, arr[2]);
+ }
+ 
+ if (arr[0] === '/') {
+   return abc(x, arr[1]) / abc(x, arr[2]);
+ }
+ if (arr[0] === '*') {
+   return abc(x, arr[1]) * abc(x, arr[2]);
+ }
+ if (arr[0] === '-') {
+   return abc(x, arr[1]) - abc(x, arr[2]);
+ }
+ 
 }
+
+Box.prototype.CANVAS_SIZE = function(w, h) {
+  this.data.dimension.w = w;
+  this.data.dimension.h = h; 
+  this.c.width = this.data.dimension.w;
+  this.c.height = this.data.dimension.h;
+ 
+  // RESET ZOOM AND XLATE BY REAPPLYING THE RANGES
+  this.RANGE_X(this.data.range.x.min, this.data.range.x.max);
+  this.RANGE_Y(this.data.range.y.min, this.data.range.y.max);
+};
 
-/*
-  let obj = {
-    'val':val,
-    'color_string':'#999',
-    'rx':3
-  }
-*/
-Box.prototype.DRAW_POINT = function(obj) {
-
-  let color_string = '#999';
-  let rx = 3;
-  if (obj.color_string) {color_string = obj.color_string}
-  if (obj.rx) {rx = obj.rx}
-
-  let pixel = this.VALUE2PIXEL(obj.val);
-  this.ctx.fillStyle = color_string;
+Box.prototype.CLEAR_CANVAS = function() {
+  this.ctx.fillStyle = '#fff';
   this.ctx.beginPath();
-  this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
+  this.ctx.rect(0, 0, this.data.dimension.w, this.data.dimension.h);
   this.ctx.fill();
 }
+Box.prototype.DRAW_HISTOGRAM = function(obj) {
+  
+  // obj.data is what i need
+  let n_bins = obj.k;
+  let bin_width = this.data.range.x.span / n_bins;
+  console.log(obj);
+  for (let i = 0; i < n_bins; i++) {
+    //console.log('this');
+    this.RECT_OUTLINE({'x':i*bin_width,'y':0}, bin_width, -obj.data[i].count, '#aaa', 1); 
+  }
+  
+}
+Box.prototype.RANGE_X = function(min, max) {
+  this.data.range.x.min = min;
+  this.data.range.x.max = max;
+  this.data.range.x.avg = (max + min) / 2;
+  this.data.range.x.span = max - min;
+  this.data.zoom.x = this.data.dimension.w / this.data.range.x.span;
+  this.data.translate.x = -this.data.range.x.min;
+}
 
+Box.prototype.RANGE_Y = function(min, max) {
+  this.data.range.y.min = min;
+  this.data.range.y.max = max;
+  this.data.range.y.avg = (max + min) / 2;
+  this.data.range.y.span = max - min;
+  this.data.zoom.y = this.data.dimension.h / this.data.range.y.span;
+  this.data.translate.y = -this.data.range.y.min;
+}
+
 /*
 let obj = {
-  'val':val,
-  'slope':slope,
-  'color_string':'#999',
-  'line_width':2
+  'points':[
+    {'x':0,'y':0},
+    {'x':0,'y':0},
+    {'x':0,'y':0}
+  ]
 }
 */
-Box.prototype.DRAW_LINE = function(obj) {
+Box.prototype.RESCALE_BASED_ON_CENTROID = function(obj) {
 
+  console.log(obj);
+  let a = obj.points[0];
+  let b = obj.points[1];
+  let c = obj.points[2];
 
-  let line_width = obj.line_width;
-  let color_string = obj.color_string;
-
-  // console.log(val);
-  let val0 = {
-    'x':this.data.range.x.min,
-    'y':obj.val.y - (obj.val.x - this.data.range.x.min)*obj.slope
-  };
-  // console.log(val0);
-  let val1 = {
-    'x':this.data.range.x.max,
-    'y':val0.y + this.data.range.x.span*obj.slope
-  };
+  let cx = (a.x + b.x + c.x)/3;
+  let cy = (a.y + b.y + c.y)/3;
   
- let pixel0 = this.VALUE2PIXEL(val0);
- let pixel1 = this.VALUE2PIXEL(val1);
+  let ra = ((a.x - cx)**2 + (a.y - cy)**2)**0.5;
+  let rb = ((b.x - cx)**2 + (b.y - cy)**2)**0.5;
+  let rc = ((c.x - cx)**2 + (c.y - cy)**2)**0.5;
 
- this.ctx.lineWidth = line_width;
- 
- this.ctx.strokeStyle = color_string;
- this.ctx.fillStyle = color_string;
- this.ctx.beginPath();
- this.ctx.moveTo(pixel0.x, pixel0.y);
- this.ctx.lineTo(pixel1.x, pixel1.y);
- this.ctx.stroke();
+  let r = 0;
+  if (ra > rb) {
+    r = ra;
+  } else {
+    r = rb;
+  }
+  if (rc > r) {
+    r = rc;
+  }
+  
+  if (a.x == b.x && b.x == c.x &&  a.y == b.y && b.y == c.y) {
+    r = 0.1;
+  }
+  
+  let z = r*3;
+  if (z < 0.5) {
+    z = 0.5;
+  }
+
+ // RESCALE
+ this.rangex(cx-z, cx+z);
+ this.rangey(cy-z, cy+z);
+  
+}
+
+/*
+let obj = {
+  'points':[
+    {'x':0,'y':0},
+    {'x':0,'y':0},
+    {'x':0,'y':0}
+  ]
+}
+*/
+Box.prototype.RESCALE_BASED_ON_CM = function(obj) {
+
+  console.log(obj);
+
+  let cx = 0;
+  let cy = 0;
+  
+  let x_min = +(9**5);
+  let x_max = -(9**5);
+  let y_min = +(9**5);
+  let y_max = -(9**5);
+
+  for (let i = 0; i < obj.points.length; i++) {
+    cx += obj.points[i].x;
+    cy += obj.points[i].y; 
+    
+    if (obj.points[i].x > x_max) {
+      x_max = obj.points[i].x;
+    }
+    if (obj.points[i].x < x_min) {
+      x_min = obj.points[i].x;
+    }
+    if (obj.points[i].y > y_max) {
+      y_max = obj.points[i].y;
+    }
+    if (obj.points[i].y < y_min) {
+      y_min = obj.points[i].y;
+    }
+
+  }
+
+  let dx = x_max - x_min;
+  let dy = y_max - y_min;
+
+  this.RANGE_X(0, x_max*5/4);
+  this.RANGE_Y(0, y_max*5/4);
+
+  return {
+    'cx':cx,
+    'cy':cy,
+    'dx':dx,
+    'dy':dy,
+    'x_min':x_min,
+    'x_max':x_max,
+    'y_min':y_min,
+    'y_max':y_max
+  }
 
 }
+Box.prototype.RETURN_CANVAS = function() {
+  return this.c;
+}
+Box.prototype.SHOW_GRID_X = function(dx_) {
+
+  let dx = 1;
+  if (arguments[0]) {
+    dx = dx_;
+  }
+
+  let x_start = Math.floor(this.data.range.x.min/dx)*dx;
+  
+  let y0 = this.data.range.y.min;
+  let y1 = this.data.range.y.max;
+
+  for (let x = x_start; x <= this.data.range.x.max; x += dx) {
+
+    let v0 = {'x':x,'y':y0};
+    let v1 = {'x':x,'y':y1};
+
+    let p0 = this.VALUE2PIXEL(v0);
+    let p1 = this.VALUE2PIXEL(v1);
+    
+    this.ctx.beginPath();
+    this.ctx.moveTo(p0.x, p0.y);
+    this.ctx.lineTo(p1.x, p1.y);
+    this.ctx.stroke();   
+  }
+};
 
 
+Box.prototype.SHOW_GRID_Y = function(dy_) {
+
+  let dy = 1;
+  if (arguments[0]) {
+    dy = dy_;
+  }
+  
+  let y_start = Math.floor(this.data.range.y.min/dy)*dy;
+  
+  let x0 = this.data.range.x.min;
+  let x1 = this.data.range.x.max;
+
+  for (let y = y_start; y <= this.data.range.y.max; y += dy) {
+
+    let v0 = {'x':x0,'y':y};
+    let v1 = {'x':x1,'y':y};
+
+    let p0 = this.VALUE2PIXEL(v0);
+    let p1 = this.VALUE2PIXEL(v1);
+    
+    this.ctx.beginPath();
+    this.ctx.moveTo(p0.x, p0.y);
+    this.ctx.lineTo(p1.x, p1.y);
+    this.ctx.stroke();   
+  }
+};
+Box.prototype.STROKE_STYLE = function(x) {
+  this.ctx.strokeStyle = x; 
+}
+
+Box.prototype.FILL_STYLE = function(x) {
+  this.ctx.fillStyle = x; 
+}
+
+Box.prototype.LINE_WIDTH = function(x) {
+  this.ctx.lineWidth = x; 
+}
+Box.prototype.RADIUS = function(rx) {
+  this.ctx.radius = rx;
+}
+Box.prototype.TEXT = function(str, val, color_string, font_size, font_family) {
+ let pixel = this.VALUE2PIXEL(val);
+ //console.log(pixel);
+ font_size = (font_size || 15);
+ font_family = (font_family || 'Arial');
+ this.ctx.font = font_size + 'px ' + font_family;
+ this.ctx.strokeStyle = (color_string || '#fff');
+ this.ctx.fillText(str, pixel.x, pixel.y);
+}
+
+Box.prototype.VALUE2PIXEL = function(val) {  // val : (0,0) is bottom-left (Cartesian)
+ return {
+  'x':(val.x+this.data.translate.x)*this.data.zoom.x,
+  'y':this.data.dimension.h - (val.y+this.data.translate.y)*this.data.zoom.y
+ }
+}
+
+Box.prototype.PIXEL2VALUE = function(pixel) { // pixel : (0,0) is top-left (standard computer/matrix grid)
+ return {
+  'x':(pixel.x/this.data.zoom.x)-this.data.translate.x,
+  'y':(this.data.dimension.h-pixel.y)/this.data.zoom.y-this.data.translate.y
+ }
+}
+/* val = {'x':x,'y':y} */
+Box.prototype.VALUE_IN_RANGE = function(val) {
+
+  let x = val.x;
+  let y = val.y;
+  let x_min = this.data.range.x.min;
+  let x_max = this.data.range.x.max; 
+  let y_min = this.data.range.y.min;
+  let y_max = this.data.range.y.max;
+  
+  if (x >= x_min && x <= x_max && y >= y_min && y <= y_max) {
+    return true;
+  } else {
+    return false;
+  }
+
+}
+
+Box.prototype.CIRCLE = function(obj) {
+
+ /*
+
+ b.CIRCLE({
+  'val':val
+  'r':r,
+  'line_width':null,
+  'stroke_style':null,
+  'fill_style':null
+ });
+
+ */
+
+ let p = this.VALUE2PIXEL(obj.val);
+ let r = this.VALUE2PIXEL({'x':obj.r + this.data.range.x.min,'y':0});
+
+ this.ctx.lineWidth = (obj.line_width || 1);
+ this.ctx.strokeStyle = (obj.stroke_style || '#3333');
+ this.ctx.fillStyle = (obj.fill_style || '#fff0');
+
+ this.ctx.beginPath();
+ this.ctx.arc(p.x, p.y, r.x, 0, 2*Math.PI);
+ this.ctx.fill();
+ this.ctx.stroke();
+ 
+}
+/* let vals = [val, val,...] */
+/* b.LINE_WIDTH(1); */
+/* b.STROKE_STYLE('#ddd'); */
+
+Box.prototype.CONNECT_VALUES = function(vals) {
+
+  for (let i = 0; i < vals.length-1; i++) {
+
+    let pixel_0 = this.VALUE2PIXEL(vals[i+0]);
+    let pixel_1 = this.VALUE2PIXEL(vals[i+1]);
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(pixel_0.x, pixel_0.y);
+    this.ctx.lineTo(pixel_1.x, pixel_1.y);
+    this.ctx.stroke();
+  }
+}
+Box.prototype.CONNECT_POINTS = function(vals) {
+
+  for (let i = 0; i < vals.length-1; i++) {
+
+    let pixel_0 = this.VALUE2PIXEL(vals[i+0]);
+    let pixel_1 = this.VALUE2PIXEL(vals[i+1]);
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(pixel_0.x, pixel_0.y);
+    this.ctx.lineTo(pixel_1.x, pixel_1.y);
+    this.ctx.stroke();
+  }
+}
 
 Box.prototype.CONNECTVALUES = function(val0, val1, color_string, line_width) {
 
@@ -665,75 +682,62 @@ Box.prototype.CONNECTVALUES2 = function(arr, color_string, line_width) {
 
   }
 }
+
+Box.prototype.SHOW_VALUE = function(val) {
 
-Box.prototype.RECT_OUTLINE = function(val, w, h, color_string, line_width) {
- let pixel = this.VALUE2PIXEL(val);
- this.ctx.lineWidth = (line_width || 1);
- this.ctx.strokeStyle = (color_string || '#333');
+ /* val = {'x':x,'y':y} */
+ /* this.RADIUS(rx) */
+ 
+ let p = this.VALUE2PIXEL(val);
+ let r = this.ctx.radius;
+
  this.ctx.beginPath();
- this.ctx.rect(pixel.x, pixel.y, w*this.data.zoom.x, h*this.data.zoom.y);
- this.ctx.stroke();
+ this.ctx.arc(p.x, p.y, r*2, 0, 2*Math.PI);
+ this.ctx.fill();
 }
-Box.prototype.RECT_SOLID = function(val, w, h, color_string, line_width) {
+Box.prototype.POINT = function(val) {
+
+ /* val = {'x':x,'y':y} */
+ /* this.RADIUS(rx) */
+
+ let p = this.VALUE2PIXEL(val);
+ let r = this.ctx.radius;
+
+ this.ctx.beginPath();
+ this.ctx.arc(p.x, p.y, r*2, 0, 2*Math.PI);
+ this.ctx.fill();
+}
+
+Box.prototype.SHOWVALUE = function(val, colorstring, rx) {
+
  let pixel = this.VALUE2PIXEL(val);
- this.ctx.fillStyle = (color_string || '#fff');
- this.ctx.fillRect(pixel.x, pixel.y, w*this.data.zoom.x, h*this.data.zoom.y);
-}
-Box.prototype.TEXT = function(str, val, color_string, font_size, font_family) {
- let pixel = this.VALUE2PIXEL(val);
- //console.log(pixel);
- font_size = (font_size || 15);
- font_family = (font_family || 'Arial');
- this.ctx.font = font_size + 'px ' + font_family;
- this.ctx.strokeStyle = (color_string || '#fff');
- this.ctx.fillText(str, pixel.x, pixel.y);
+ this.ctx.fillStyle = colorstring;
+ this.ctx.beginPath();
+ this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
+ this.ctx.fill();
+
 }
 
-
-function abc(x, arr) {
-
- if (arr[0] === 'get') {
-   if (arr[1] === 'x') {
-     return x;
-   } else {
-     return eval(arr[1]);        // why do ppl hate eval so much? why should i not use it?
-   }
- }
- if (arr%arr===0) {
-   return arr;
- }
- 
- if (arr[0] === '**') {
-   return abc(x, arr[1])**abc(x, arr[2]);
- }
- 
- if (arr[0] === '/') {
-   return abc(x, arr[1]) / abc(x, arr[2]);
- }
- if (arr[0] === '*') {
-   return abc(x, arr[1]) * abc(x, arr[2]);
- }
- if (arr[0] === '-') {
-   return abc(x, arr[1]) - abc(x, arr[2]);
- }
- 
-}
-Box.prototype.DRAW_HISTOGRAM = function(obj) {
-  
-  // obj.data is what i need
-  let n_bins = obj.k;
-  let bin_width = this.data.range.x.span / n_bins;
-  console.log(obj);
-  for (let i = 0; i < n_bins; i++) {
-    //console.log('this');
-    this.RECT_OUTLINE({'x':i*bin_width,'y':0}, bin_width, -obj.data[i].count, '#aaa', 1); 
+/*
+  let obj = {
+    'val':val,
+    'color_string':'#999',
+    'rx':3
   }
-  
+*/
+Box.prototype.DRAW_POINT = function(obj) {
+
+  let color_string = '#999';
+  let rx = 3;
+  if (obj.color_string) {color_string = obj.color_string}
+  if (obj.rx) {rx = obj.rx}
+
+  let pixel = this.VALUE2PIXEL(obj.val);
+  this.ctx.fillStyle = color_string;
+  this.ctx.beginPath();
+  this.ctx.arc(pixel.x, pixel.y, rx, 0, 2*Math.PI);
+  this.ctx.fill();
 }
-
-
-
-
 
 /*
   let obj = {
@@ -749,11 +753,169 @@ Box.prototype.DRAW_VALUE = function(obj) {
  this.ctx.arc(pixel.x, pixel.y, obj.rx, 0, 2*Math.PI);
  this.ctx.fill();
 }
+/* let vals = [val, val,...] */
+Box.prototype.RECT = function(vals) {
 
+  let pixels = [];
+  pixels[0] = this.VALUE2PIXEL(vals[0]);
+  pixels[1] = this.VALUE2PIXEL(vals[1]);
+  pixels[2] = this.VALUE2PIXEL(vals[2]);
+  pixels[3] = this.VALUE2PIXEL(vals[3]);
 
+  this.ctx.beginPath();
+  this.ctx.moveTo(pixels[0].x, pixels[0].y);
+  this.ctx.lineTo(pixels[1].x, pixels[1].y);
+  this.ctx.lineTo(pixels[2].x, pixels[2].y);
+  this.ctx.lineTo(pixels[3].x, pixels[3].y);
+  this.ctx.lineTo(pixels[0].x, pixels[0].y);
+  this.ctx.stroke();
+  this.ctx.fill();
+}
+/* let vals = [val, val,...] */
+Box.prototype.SHAPE = function(vals) {
+  
+  let p0 = this.VALUE2PIXEL(vals[0]);
+  this.ctx.beginPath();
+  this.ctx.moveTo(p0.x, p0.y);
+    
+  for (let i = 1; i < vals.length; i++) {
+    let pixel = this.VALUE2PIXEL(vals[i]);
+    this.ctx.lineTo(pixel.x, pixel.y);
+  }
+  this.ctx.lineTo(p0.x, p0.y);
 
+  this.ctx.stroke();
+  this.ctx.fill();
+}
 
+
+function Gear(obj) {
 
+/* 
+g = new Gear({
+  'val':val,
+  'n':n,
+  'r_inner':r_inner,
+
+  'r_outer':null,
+  'theta':null,
+  'd_theta':null,
+  'omega':null,
+
+  'line_width':null,
+  'stroke_style':null,
+  'fill_style':null
+})
+
+*/ 
+ 
+
+  this.cx = obj.val.x;
+  this.cy = obj.val.y;
+  this.n = obj.n;                 // THE NUMBER OF TEETH
+  this.r_inner = obj.r_inner;     // ROOT RADIUS
+  
+  
+  // INNER RADIUS + DEPTH OF TEETH = OUTER RADIUS 
+  this.r_outer = (obj.r_outer || obj.r_inner * 1.07);
+  this.theta = (obj.theta || 0); // angular position
+  this.d_theta = (obj.d_theta || 0);;   // initial shift in angular position
+  
+  // ANGULAR VELOCITY
+  this.omega = (Math.random() > 0.5) ? (0.5) : (-0.5);
+  if (obj.omega && obj.omega !== null) {
+    this.omega = obj.omega;
+  }
+  
+  
+  
+  this.line_width = (obj.line_width || 1);
+  this.stroke_style = (obj.stroke_style || '#3339');
+  this.fill_style = (obj.fill_style || '#fff0');
+ 
+
+  // EVERYTHING IN RADIANS
+  this.theta_tranche_rad = (360/this.n)*(Math.PI/180);  // THE ANGLE IN RADIANS OF EACH SLICE OR TRANCHE OF THE GEAR
+  this.d_theta_rad =  this.d_theta*(Math.PI/180);      // THE SHIFT IN RADIANS AWAY FROM THE ORIGINAL THETA
+  this.omega_rad = this.omega*(Math.PI/180);
+
+  // this.cx_rel = this.cx / this.box.data.range.x.span;
+
+};
+
+Gear.prototype.update = function() {
+  
+  // this.cx = this.cx_rel * window.innerWidth;
+  this.d_theta_rad += this.omega_rad;
+  // console.log(this);
+}
+
+Box.prototype.GEAR = function(Gear) {
+
+  this.FILL_STYLE(Gear.stroke_style);
+  this.RADIUS(1);
+  this.POINT({'x':Gear.cx,'y':Gear.cy});
+
+  this.LINE_WIDTH(Gear.line_width);
+  this.STROKE_STYLE(Gear.stroke_style);
+  
+  for (let i = 0; i < Gear.n; i++) {
+    
+    let a0 = Gear.theta_tranche_rad*i + Gear.d_theta_rad;    // SET THE ANGLE OF THE MAIN TRANCHE
+    let a1 = a0 + Gear.theta_tranche_rad*(1/2)*(1/3);
+    let a2 = a0 + Gear.theta_tranche_rad*(1/2)*(2/3);
+    let a3 = a0 + Gear.theta_tranche_rad*(1/2)*(3/3);
+    let a4 = a0 + Gear.theta_tranche_rad;
+    
+    this.CONNECT_POINTS([
+      {'x':Gear.cx + Math.cos(a0)*Gear.r_inner,'y':Gear.cy + Math.sin(a0)*Gear.r_inner},
+      {'x':Gear.cx + Math.cos(a1)*Gear.r_outer,'y':Gear.cy + Math.sin(a1)*Gear.r_outer},
+      {'x':Gear.cx + Math.cos(a2)*Gear.r_outer,'y':Gear.cy + Math.sin(a2)*Gear.r_outer},
+      {'x':Gear.cx + Math.cos(a3)*Gear.r_inner,'y':Gear.cy + Math.sin(a3)*Gear.r_inner},
+      {'x':Gear.cx + Math.cos(a4)*Gear.r_inner,'y':Gear.cy + Math.sin(a4)*Gear.r_inner},
+    ]);
+
+  }
+
+};
+
+
+/*
+  let obj = {
+    'budget':budget,
+    'px':px,
+    'py':py
+  }
+*/
+Box.prototype.DRAW_BUDGET_LINE = function(obj) {
+
+  let budget = obj.budget;
+  let px = obj.px;
+  let py = obj.py;
+
+  let line_width = 2;
+  let color_string = '#000';
+
+  if (obj.color_string) {color_string = obj.color_string};
+  if (obj.line_width) {line_width = obj.line_width};
+  
+  let x_int = {'x':budget/px,'y':0};
+  let y_int = {'x':0,'y':budget/py};
+
+  let pixel0 = this.VALUE2PIXEL(x_int);
+  let pixel1 = this.VALUE2PIXEL(y_int);
+
+  this.ctx.lineWidth = line_width;
+ 
+  this.ctx.strokeStyle = color_string;
+  this.ctx.fillStyle = color_string;
+  this.ctx.beginPath();
+  this.ctx.moveTo(pixel0.x, pixel0.y);
+  this.ctx.lineTo(pixel1.x, pixel1.y);
+  this.ctx.stroke();
+};
+
+
 /*
   obj = {
     'alpha':[alpha0, alpha1],
@@ -1198,148 +1360,366 @@ Box.prototype.DRAW_DEMAND_CURVE = function(obj) {
   };
   
 }
-
-
-
-
+
 /*
-  let obj = {
-    'budget':budget,
-    'px':px,
-    'py':py
-  }
+let obj = {
+  'val':val,
+  'slope':slope,
+  'color_string':'#999',
+  'line_width':2
+}
 */
-Box.prototype.DRAW_BUDGET_LINE = function(obj) {
+Box.prototype.DRAW_LINE = function(obj) {
 
-  let budget = obj.budget;
+
+  let line_width = obj.line_width;
+  let color_string = obj.color_string;
+
+  // console.log(val);
+  let val0 = {
+    'x':this.data.range.x.min,
+    'y':obj.val.y - (obj.val.x - this.data.range.x.min)*obj.slope
+  };
+  // console.log(val0);
+  let val1 = {
+    'x':this.data.range.x.max,
+    'y':val0.y + this.data.range.x.span*obj.slope
+  };
+  
+ let pixel0 = this.VALUE2PIXEL(val0);
+ let pixel1 = this.VALUE2PIXEL(val1);
+
+ this.ctx.lineWidth = line_width;
+ 
+ this.ctx.strokeStyle = color_string;
+ this.ctx.fillStyle = color_string;
+ this.ctx.beginPath();
+ this.ctx.moveTo(pixel0.x, pixel0.y);
+ this.ctx.lineTo(pixel1.x, pixel1.y);
+ this.ctx.stroke();
+
+}
+
+/*
+
+  obj = {
+    'delta':delta,
+    'alpha':alpha,
+    'beta':beta,
+    'px':px,
+    'py':py,
+    'budget':budget
+  }
+  
+*/
+
+Box.prototype.GET_CES_MARSHALLIAN_ALLOCATION = function(obj) {
+
+  let delta = obj.delta;
+  let delta_inv = 1/delta;
+  let alpha = obj.alpha;
+  let beta = obj.beta;
   let px = obj.px;
   let py = obj.py;
-
-  let line_width = 2;
-  let color_string = '#000';
-
-  if (obj.color_string) {color_string = obj.color_string};
-  if (obj.line_width) {line_width = obj.line_width};
+  let budget = obj.budget;
   
-  let x_int = {'x':budget/px,'y':0};
-  let y_int = {'x':0,'y':budget/py};
-
-  let pixel0 = this.VALUE2PIXEL(x_int);
-  let pixel1 = this.VALUE2PIXEL(y_int);
-
-  this.ctx.lineWidth = line_width;
- 
-  this.ctx.strokeStyle = color_string;
-  this.ctx.fillStyle = color_string;
-  this.ctx.beginPath();
-  this.ctx.moveTo(pixel0.x, pixel0.y);
-  this.ctx.lineTo(pixel1.x, pixel1.y);
-  this.ctx.stroke();
-};
-
-/*
-let obj = {
-  'points':[
-    {'x':0,'y':0},
-    {'x':0,'y':0},
-    {'x':0,'y':0}
-  ]
-}
-*/
-Box.prototype.RESCALE_BASED_ON_CM = function(obj) {
-
-  console.log(obj);
-
-  let cx = 0;
-  let cy = 0;
+  let A = (alpha * py) / (beta * px);
+  let B = (1 / (delta - 1));
+  let C = A**B;
+  let C_INV = 1/ C;
   
-  let x_min = +(9**5);
-  let x_max = -(9**5);
-  let y_min = +(9**5);
-  let y_max = -(9**5);
+  let x = null;
+  let y = null;
+  let u = null;
 
-  for (let i = 0; i < obj.points.length; i++) {
-    cx += obj.points[i].x;
-    cy += obj.points[i].y; 
+  let output = {
+    'delta':delta,
+    'alpha':alpha,
+    'beta':beta,
+    'px':px,
+    'py':py,
+    'budget':budget,
+    'A':A,
+    'B':B,
+    'C':C
+  }
+  
+  // SET THE TYPE
+  output.type = "ELSE";
+  output.delta = delta;
+  if (delta === 1) {output.type = "LINEAR"}
+  if (delta === 0) {output.type = "LOG"}
+  if (delta < -100) {output.type = "LEONTIEFF"}
+
+  if (output.type === "LINEAR") {
     
-    if (obj.points[i].x > x_max) {
-      x_max = obj.points[i].x;
+    if (alpha/px > beta/py) {
+     x = budget / px;
+     y = 0;
     }
-    if (obj.points[i].x < x_min) {
-      x_min = obj.points[i].x;
+    if (alpha/px < beta/py) {
+     x = 0;
+     y = budget / py;
     }
-    if (obj.points[i].y > y_max) {
-      y_max = obj.points[i].y;
+    if (alpha/px === beta/py) {
+     x = 0.5 * budget / px;
+     y = 0.5 * budget / py;
     }
-    if (obj.points[i].y < y_min) {
-      y_min = obj.points[i].y;
-    }
+    u = alpha*x + beta*y;
 
+    output.expenditure = px*x + py*y; 
+    output.u = u;
+    output.x = x;
+    output.y = y;
+    return output;
   }
+ 
+  if (output.type === "LOG") {
+    
+    x = alpha/(alpha + beta) * budget / px;
+    y = beta/(alpha + beta) * budget / py;
+    u = x**alpha*y**beta;
+    
+    // i should find a way to add both log utilities, because sometimes we use cobb douglas, other times the log version
+    
+    output.expenditure = px*x + py*y; 
+    output.u = u;
+    output.x = x;
+    output.y = y;
+    return output;
+  } 
+  
+  if (output.type === "LEONTIEFF") {
+    
+    x = budget / (px + py);
+    y = budget / (px + py);
+    u = x;
+    
+    output.expenditure = px*x + py*y; 
+    output.u = u;
+    output.x = x;
+    output.y = y;
+    return output;
+  } 
+  
 
-  let dx = x_max - x_min;
-  let dy = y_max - y_min;
+  // GENERAL CES : THE ELSE CASE
+  x = budget / (px + py * C);
+  y = budget / (px * C_INV + py);
+  u = (alpha * x ** delta + beta * y ** delta)**delta_inv;
 
-  this.RANGE_X(0, x_max*5/4);
-  this.RANGE_Y(0, y_max*5/4);
-
-  return {
-    'cx':cx,
-    'cy':cy,
-    'dx':dx,
-    'dy':dy,
-    'x_min':x_min,
-    'x_max':x_max,
-    'y_min':y_min,
-    'y_max':y_max
-  }
+  output.expenditure = px*x + py*y; 
+  output.u = u;
+  output.x = x;
+  output.y = y;
+  return output;
 
 }
+/*
 
-/*
-let obj = {
-  'points':[
-    {'x':0,'y':0},
-    {'x':0,'y':0},
-    {'x':0,'y':0}
-  ]
-}
+ u = (alpha/delta)*x**delta + (beta/delta)*y**delta
+
+ b.LINE_WIDTH(2);
+ b.STROKE_STYLE('#fc0a');
+ b.SHOW_INDIFFERENCE_CURVE({
+  'delta':delta,    // must
+  'alpha':alpha,    // must
+  'beta':beta,      // must
+  'u':u,            // SUFFICIENT, BUT NOT A GOOD CHOICE
+  'x':x,            // PREFERABLE
+  'y':y,            // PREFERABLE
+  'budget':budget,
+  'px':px,
+  'py':py
+ }
+
+  FUNCTIONAL DEPENDENCIES
+  1. this.CONNECT_VALUES(arr)
+  
+  ** verifiy when delta = -145
+  ** verify when delta = 0.90 to 1.00
+  ** when does it hit 0 ?
+  ** how arr is sorted
+
 */
-Box.prototype.RESCALE_BASED_ON_CENTROID = function(obj) {
 
-  console.log(obj);
-  let a = obj.points[0];
-  let b = obj.points[1];
-  let c = obj.points[2];
 
-  let cx = (a.x + b.x + c.x)/3;
-  let cy = (a.y + b.y + c.y)/3;
+// CES UTILITY
+Box.prototype.SHOW_CES_INDIFFERENCE_CURVE = function(obj) {
   
-  let ra = ((a.x - cx)**2 + (a.y - cy)**2)**0.5;
-  let rb = ((b.x - cx)**2 + (b.y - cy)**2)**0.5;
-  let rc = ((c.x - cx)**2 + (c.y - cy)**2)**0.5;
-
-  let r = 0;
-  if (ra > rb) {
-    r = ra;
-  } else {
-    r = rb;
-  }
-  if (rc > r) {
-    r = rc;
-  }
+  // must have delta, alpha and beta
+  // and we must either have utility, or have what we need to make utility
+ 
+  // case 1 : u
+  // case 2 : u=f(x,y)
+  // case 3 : x=f(M,px) : y=f(M,py) : u=f(x,y)
   
-  if (a.x == b.x && b.x == c.x &&  a.y == b.y && b.y == c.y) {
-    r = 0.1;
-  }
   
-  let z = r*3;
-  if (z < 0.5) {
-    z = 0.5;
+  // I CAN ACTUALLY SET DELTA = -INFINITY HERE, SO I SHOULD DO THAT, IF DELTA IS BIG ENOUGH
+  
+  
+  let output = {
+    'delta':null,
+    'alpha':null,
+    'beta':null,
+    'u':null,
+    'x':null,            
+    'y':null,
+    'type':null,
+    'procedure':null,
+    'x_c':null,
+    'y_c':null
   }
 
- // RESCALE
- this.rangex(cx-z, cx+z);
- this.rangey(cy-z, cy+z);
+  let alpha, alpha_inv, beta, beta_inv, delta, delta_inv;
+  let u;
+  let x, y;
+
+  alpha = obj.alpha;
+  alpha_inv = 1/alpha;
+  beta = obj.beta;
+  beta_inv = 1/beta;
   
+  delta = obj.delta;
+  delta_inv = (1/delta || null);
+  
+  // SET THE TYPE
+  output.type = "ELSE";
+  output.delta = delta;
+  if (delta === 1) {output.type = "LINEAR"}
+  if (delta === 0) {output.type = "LOG"}
+  if (delta < -100) {output.type = "LEONTIEFF"}
+
+  output.alpha = alpha;
+  output.beta = beta;
+
+
+
+  // FIRST CASE :
+  if (obj.u) {
+    output.procedure = 'FIRST : UTILITY SUPPLIED';
+    u = obj.u;
+    output.u = u;
+  }
+
+  // SECOND CASE : u = u(x, y)
+  if (!obj.u && (obj.x && obj.y)) {
+    output.procedure = 'SECOND : UTILITY CALCULATED';
+
+    x = obj.x;
+    y = obj.y;
+    
+    output.x = x;
+    output.y = y;
+    
+    if (output.type === "LINEAR") {u = alpha*x + beta*y};
+    if (output.type === "LOG") {u = x**alpha*y**beta};
+    if (output.type === "LEONTIEFF") {u = 1};
+    if (output.type === "ELSE") {u = (alpha*x**delta + beta*y**delta)**delta_inv};
+    
+    output.u = u;
+  }
+
+  // THE DOMAIN AND RANGE
+  output.x_c = null;
+  output.y_c = null;
+  if (delta !== 0) {
+    output.x_c = (u**delta / alpha)**(1/delta);
+    output.y_c = (u**delta / beta)**(1/delta);
+  }
+  
+
+  // LINEAR
+  if (output.type === "LINEAR") {
+    this.CONNECT_VALUES([{'x':0,'y':u/beta},{'x':u/alpha,'y':0}]);
+    return output;
+  }
+  
+  // LEONTIEFF
+  if (output.type === "LEONTIEFF") {
+
+    return output;
+  }
+  
+  // FOR LOG AND ELSE, WE LOOP
+  
+  // LOG
+  if (output.type === "LOG") {
+    
+    let dx = this.data.range.x.max / 50;
+    let dy = this.data.range.y.max / 50;
+    let x_index = 0, y_index = 0;
+    let arr = [];
+
+    for (let i = 0; i <= 50; i++) {
+
+      arr[2*i+0] = {'x':x_index,'y':(u/x_index**alpha)**beta_inv};
+      arr[2*i+1] = {'x':(u/x_index**beta)**alpha_inv,'y':y_index};
+      x_index += dx;
+      y_index += dy;
+    }
+    
+    arr.sort(function(a,b) {
+      return a.x - b.x;
+    }); 
+
+    
+    this.CONNECT_VALUES(arr);
+    return output;
+  }
+
+  
+
+
+
+  // THIS IS THE ELSE CASE
+
+  let dx = this.data.range.x.max / 50;
+  let dy = this.data.range.y.max / 50;
+  
+  let x_index = 0, y_index = 0;
+  let arr = [];
+
+  for (let i = 0; i <= 50; i++) {
+  
+    // THE ELSE CASES **
+    if (u**delta >= alpha*x_index**delta) {
+      arr.push({
+        'x':x_index,
+        'y':((u**delta - alpha*x_index**delta)/beta)**delta_inv
+      });
+    }
+    if (u**delta >= beta*y_index**delta) {
+      arr.push({
+        'x':((u**delta - beta*y_index**delta)/alpha)**delta_inv,
+        'y':y_index
+      });
+    }
+
+    x_index += dx;
+    y_index += dy;
+    
+  } // closing for loop
+
+  // ** WE USE X AND Y TO GET U
+  // WHEN WE LOOP OVER X, WE TRY TO FIND THE Y THAT MAKES THAT U POSSIBLE
+  // BUT WHEN DELTA < 0, THERE MAY NOT EXIST SUCH A Y
+  // AND IF WE DONT ACCOUNT FOR THAT, WELL GET WACKY VALUES PLOTTED ON THE GRAPH
+  
+  // WHEN 0 < DELTA < 1, WE CAN FIND AN X OR Y TO MEET U GIVEN AND OTHER Y OR X, RESPECTIVELY 
+
+  // SORT ARR : IF it's almost leontieff, ie. delta = -140, then i need to sort by x, from lowest to smallest
+  // then if 2 points have the same x, from largest to smallest
+  arr.sort(function(a,b) {
+    return a.x - b.x;
+  });
+  // console.log(arr);
+  // once its sorted, it might make sense to do a while loop to remove the points at the beginning and end that are not on the grid
+  
+  this.CONNECT_VALUES(arr);
+  
+  return output;
 }
+
+
+
