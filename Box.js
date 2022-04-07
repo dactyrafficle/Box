@@ -1,4 +1,4 @@
-/* LAST UPDATED : 2022-02-17-1830 EST */
+/* LAST UPDATED : 2022-04-07-0613 EDT */
 
 /*
 
@@ -201,7 +201,7 @@ Box.prototype.SHOW_FLOATING_X_AXIS = function(n, y_val) {
 
  this.ctx.textAlign = 'right';
  this.ctx.textBaseline = 'middle';
- this.ctx.fillText((this.data.label.x).toUpperCase(), sw*(n1-0.25), sh);
+ // this.ctx.fillText((this.data.label.x).toUpperCase(), sw*(n1-0.25), sh);
 
 };
 
@@ -237,7 +237,7 @@ Box.prototype.SHOW_FLOATING_Y_AXIS = function(n) {
  
  this.ctx.textAlign = 'center';
  this.ctx.textBaseline = 'top';
- this.ctx.fillText((this.data.label.y), sw, sh*(n2+0.25));
+ // this.ctx.fillText((this.data.label.y), sw, sh*(n2+0.25));
 };
 Box.prototype.SHOW_FLOATING_LOG_X_AXIS = function(obj) {
 
@@ -334,8 +334,11 @@ Box.prototype.CANVAS_SIZE = function(w, h) {
   this.RANGE_Y(this.data.range.y.min, this.data.range.y.max);
 };
 
-Box.prototype.CLEAR_CANVAS = function() {
-  this.ctx.fillStyle = '#fff';
+Box.prototype.CLEAR_CANVAS = function(color_string) {
+  
+  // maybe i need to delete everything from the canvas, then paint this. because if i want a background that is transparent, i cant paint transparent. the previous thing will show.
+  
+  this.ctx.fillStyle = (color_string || '#ffff');
   this.ctx.beginPath();
   this.ctx.rect(0, 0, this.data.dimension.w, this.data.dimension.h);
   this.ctx.fill();
@@ -827,7 +830,7 @@ g = new Gear({
     this.omega = obj.omega;
   }
   
-  
+  this.frame_count = 0;
   
   this.line_width = (obj.line_width || 1);
   this.stroke_style = (obj.stroke_style || '#3339');
@@ -845,9 +848,11 @@ g = new Gear({
 
 Gear.prototype.update = function() {
   
-  // this.cx = this.cx_rel * window.innerWidth;
-  this.d_theta_rad += this.omega_rad;
-  // console.log(this);
+  // TO PREVENT SLIPPING
+  this.frame_count++;
+  this.d_theta_rad = this.omega_rad * this.frame_count;
+  
+  // this.d_theta_rad += this.omega_rad;
 }
 
 Box.prototype.GEAR = function(Gear) {
@@ -879,6 +884,216 @@ Box.prototype.GEAR = function(Gear) {
 
 };
 
+
+/*
+  let obj = {
+    'arr':arr,  required
+    'key':'x',
+    'bins':8,
+    'min':-3,
+    'max':3
+  }
+*/
+
+
+// 2022-04-07 : right now, only the minimal version works. the minimal version
+// let hist_x = new Histogram({'arr':arr});
+// container.appendChild(hist_x.RETURN_CANVAS());
+
+function Histogram(obj) {
+  
+  this.arr;
+  
+  // IF THE INPUT DATA IS JUST A SIMPLE ARRAY
+  if (!obj.hasOwnProperty('key')) {
+    this.arr = obj.arr;
+  }
+  // console.log(this.arr);
+ 
+  
+  // GET THE UPPER AND LOWER BOUNDS OF THE DATA
+  this.global_lower_bound = 999999;
+  this.global_upper_bound = -999999;
+  for (let i = 0; i < this.arr.length; i++) {
+    if (this.arr[i] > this.global_upper_bound) {this.global_upper_bound = this.arr[i];}
+    if (this.arr[i] < this.global_lower_bound) {this.global_lower_bound = this.arr[i];}
+  }
+  
+  
+  // STURGES FORMULA k = CEIL(log_2(n)) + 1
+  this.number_of_bins = Math.ceil(Math.log(this.arr.length) / Math.log(2)) + 1;
+
+  this.global_range = (this.global_upper_bound - this.global_lower_bound);
+  this.bin_width = this.global_range / this.number_of_bins;
+
+
+  // DEFINE WHAT IS A BIN
+  function Bin(bin_index, bin_lower_bound, bin_upper_bound) {
+    this.bin_index = bin_index;
+    this.bin_lower_bound = bin_lower_bound;
+    this.bin_upper_bound = bin_upper_bound;
+    this.bin_count = 0;
+    this.bin_arr = [];
+  }
+
+
+  // MAKE THE BINS
+  this.bins = [];
+  for (let i = 0; i < this.number_of_bins; i++) {
+    this.bins.push({
+     'bin_index':i,
+     'bin_lower_bound':this.global_lower_bound + i*this.bin_width,
+     'bin_upper_bound':this.global_lower_bound + (i+1)*this.bin_width,
+     'bin_count':0,
+     'bin_arr':[]
+    });
+  }
+
+
+  // SORT THE DATA INTO THE BINS
+  for (let i = 0; i < this.arr.length; i++) {
+    
+    let val = this.arr[i];
+    let index = 0;
+    
+    if (val === this.global_upper_bound) {
+      index = this.number_of_bins - 1;
+    }
+    
+    if (val !== this.global_upper_bound) {
+      index = Math.floor((val - this.global_lower_bound) / this.bin_width);
+    }
+
+    let bin = this.bins[index];
+    bin.bin_count++;
+    bin.bin_arr.push(val);
+    
+  }
+  // console.log(this);
+
+};
+
+
+Histogram.prototype.RETURN_CANVAS = function() {
+  
+ let b = new Box();
+
+
+  b.CANVAS_SIZE(500, 400);
+  b.RANGE_X(-this.bin_width + this.global_lower_bound, this.global_upper_bound + this.bin_width);          
+  b.RANGE_Y(-5, 100 + 5);
+
+  b.CLEAR_CANVAS();
+
+  // GRIDLINES 
+  b.LINE_WIDTH(1);
+  b.STROKE_STYLE('#ddd');
+  b.SHOW_GRID_X(this.bin_width);
+  b.SHOW_GRID_Y(10);
+
+  // AXES 
+  b.LINE_WIDTH(2);
+  b.STROKE_STYLE('#999');
+  b.SHOW_AXES();
+  
+
+  this.max_bin_count = 0;
+  
+  for (let i = 0; i < this.bins.length; i++) {
+    if (this.bins[i].bin_count > this.max_bin_count) {this.max_bin_count = this.bins[i].bin_count};
+  }
+  
+  // DRAW A RECTANGLE
+  b.LINE_WIDTH(2);
+  b.STROKE_STYLE('#99B3E6');
+  b.FILL_STYLE('#D6E0F5aa');
+  
+  for (let i = 0; i < this.bins.length; i++) {
+  
+    b.RECT([
+      {'x':this.bins[i].bin_lower_bound,'y':0},
+      {'x':this.bins[i].bin_lower_bound,'y': 100 * this.bins[i].bin_count / this.max_bin_count},
+      {'x':this.bins[i].bin_upper_bound,'y': 100 * this.bins[i].bin_count /  this.max_bin_count},
+      {'x':this.bins[i].bin_upper_bound,'y':0}
+    ]);
+    
+  }
+
+  return b.RETURN_CANVAS();
+};
+
+
+
+
+function GET_HISTOGRAM_FROM_ARR_OF_OBJS(obj) {
+  
+  let bins = {};
+  
+  let arr = obj.arr;
+  let key = obj.key;
+  let n = obj.arr.length;
+  
+  // DEFAULT VALUES FOR K, X_MIN, X_MAX, DX
+
+  let k = Math.ceil(Math.log(n)/Math.log(2)) + 1;
+  
+  arr.sort(function(a,b) {
+    return a[key] - b[key];
+  });
+  
+  let x_min = parseFloat(arr[0][key]);
+  let x_max = parseFloat(arr[n-1][key]);
+  
+  let dx = (x_max - x_min) / k;
+  
+  /*** ***/
+  
+  if (obj.x_min === 0) {
+    x_min = parseFloat(obj.x_min);
+  }
+  if (obj.x_max && obj.x_max !== null) {
+    x_max = parseFloat(obj.x_max);
+  }
+  if (parseFloat(obj.k) > 0) {
+    k = parseFloat(obj.k);
+    dx = (x_max - x_min) / k;
+  }
+  if (parseFloat(obj.dx) > 0) {
+    dx = parseFloat(obj.dx);
+    k = null;
+  }
+
+  
+
+  // THIS WILL STORE THE VALUE OF THE BIN WITH THE HIGHEST FREQUENCY
+  let f_max = 0;
+  
+  // STORE VALUES IN THE HISTOGRAM
+  arr.forEach(function(row, i) {
+    
+    let x = parseFloat(row[key]);             // GET THE VALUE OF THE ROW
+    let bin = Math.floor((x - x_min)/dx);     // WHAT BIN DOES IT GO INTO ?
+    
+    bins[bin] = (bins[bin] + 1 || 1);   // PUT IT IN THAT BIN BY INCREMENTING THE BIN
+    
+    if (bins[bin] > f_max) {
+      f_max = bins[bin];
+    }
+  });
+  
+  // HISTOGRAM OBJECT
+  return {
+    'bins':bins,
+    'x_min':x_min,
+    'x_max':x_max,
+    'k':k,
+    'n':n,
+    'f_max':f_max,
+    'dx':dx,
+    'n':arr.length
+  };
+  
+}
 
 /*
   let obj = {
