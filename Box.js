@@ -1,4 +1,4 @@
-/* LAST UPDATED : 2022-04-07-0613 EDT */
+/* LAST UPDATED : 2022-04-13-1002 EDT */
 
 /*
 
@@ -920,8 +920,16 @@ function Histogram(obj) {
   }
   
   
-  // STURGES FORMULA k = CEIL(log_2(n)) + 1
+  // DEFAULT : STURGES FORMULA k = CEIL(log_2(n)) + 1
   this.number_of_bins = Math.ceil(Math.log(this.arr.length) / Math.log(2)) + 1;
+  
+  // IF THE PROPERTY EXISTS, OVERWRITE THE DEFAULT
+  if (obj.hasOwnProperty('number_of_bins')) {
+    this.number_of_bins = obj.number_of_bins;
+  }
+  // console.log(this);
+  
+  
 
   this.global_range = (this.global_upper_bound - this.global_lower_bound);
   this.bin_width = this.global_range / this.number_of_bins;
@@ -1935,6 +1943,94 @@ Box.prototype.SHOW_CES_INDIFFERENCE_CURVE = function(obj) {
   
   return output;
 }
+
+
+function rnorm() {
+ let u = 0, v = 0;
+ while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+ while(v === 0) v = Math.random();
+ return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+};
+// takes one argument: df[required]
+function chisq(df) {
+  let w = 0;
+  for (let i = 0; i < df; i++) {
+    w += Math.pow(rnorm(), 2);
+  }
+  return w;
+};
+
+
+  let raf = (function() {
+  
+    // a local variable
+    let s = 10;
+  
+    // object stored in r
+    return {
+      sum: function(arr) {
+        let a = 0;
+        for (let i = 0; i < arr.length; i++) {
+          a += arr[i];
+        }
+        return a;
+      },
+      count: function(arr) {
+        return arr.length;
+      },
+      mean: function(arr) {
+        return this.sum(arr) / this.count(arr);
+      },
+      rnorm: function() {
+        let u = 0, v = 0;
+        while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+        while(v === 0) v = Math.random();
+        return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+      },
+      rchisq: function(df) {
+        let w = 0;
+        for (let i = 0; i < df; i++) {
+          w += Math.pow(rnorm(), 2);
+        }
+        return w;
+      },
+      gen: function(n) {
+        let arr = [];
+        for (let i = 0; i < n; i++) {
+          arr.push(this.rnorm());
+        }
+        return arr;
+      },
+      variance: function(arr) {
+        
+        let mean = this.mean(arr);
+        let a = 0;
+        for (let i = 0; i < arr.length; i++) {
+          a += Math.pow((arr[i] - mean), 2);
+        }
+        return a / arr.length;
+        
+      },
+      covariance: function(arr1, arr2) {
+        
+        let mean1 = this.mean(arr1);
+        let mean2 = this.mean(arr2);
+        
+        let a = 0;
+        for (let i = 0; i < arr1.length; i++) {
+          a += (arr1[i] - mean1) * (arr2[i] - mean2);
+        }
+        return a / arr1.length;
+        
+      },
+      add: function(x) {
+        return s += x;
+      }
+    }
+  })();
+  
+  
+
 
 
 

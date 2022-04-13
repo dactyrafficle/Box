@@ -8,11 +8,11 @@
 
   <title> BOX </title>
   
-  <link rel="icon" href="./a.png">
-  <link rel="stylesheet" href="./a.css">
-  <script src="./a.js"></script>
+  <link rel="icon" href="./include/a.png">
+  <link rel="stylesheet" href="./include/a.css">
+  <script src="./include/a.js"></script>
   
-  <script src='./Box.js'></script>
+  <script src='./include/Box.js'></script>
 
   <script src='./setup_basic.js'></script>
   <script src='./setup_ces_idc.js'></script>
@@ -177,12 +177,14 @@ b.VALUE_IN_RANGE(<span class='val'>val</span>);
  </pre>
  
  </div>
- </div> <!-- closing general -->  <div class='section border margin padding'>
+ </div> <!-- closing general -->  
+  
+  <div class='section border margin padding'>
 
 <div class='box margin padding'>
 
   <pre>  <span class='comment'>// DRAW POINTS</span>
-  b.FILL_STYLE('#fc0a');
+  b.FILL_STYLE('<span style='padding: 0.15em; font-weight: bold; color: #fc0; background-color: #ffff;'>#FC0</span>');
   b.RADIUS(2);
   b.POINT({'x':3,'y':4.5});
   b.POINT({'x':4,'y':4.0});
@@ -190,7 +192,7 @@ b.VALUE_IN_RANGE(<span class='val'>val</span>);
 
   <span class='comment'>// DRAW A LINE</span>
   b.LINE_WIDTH(3);
-  b.STROKE_STYLE('#9fdfbf');
+  b.STROKE_STYLE('<span style='padding: 0.15em; font-weight: bold; color: #9fdfbf; background-color: #ffff;'>#9FDFBF</span>');
   b.CONNECT_VALUES([
     {'x':5,'y':9},
     {'x':9,'y':8},
@@ -199,8 +201,8 @@ b.VALUE_IN_RANGE(<span class='val'>val</span>);
   
   <span class='comment'>  // DRAW A RECTANGLE</span>
   b.LINE_WIDTH(3);
-  b.STROKE_STYLE('#99b3e6');
-  b.FILL_STYLE('#d6e0f555');
+  b.STROKE_STYLE('<span style='padding: 0.15em; font-weight: bold; color: #99b3e6; background-color: #ffff;'>#99B3E6</span>');
+  b.FILL_STYLE('<span style='padding: 0.15em; font-weight: bold; color: #d6e0f5; background-color: #ffff;'>#D6E0F5</span>');
   b.RECT([
     {'x':7,'y':3},
     {'x':9,'y':7},
@@ -213,8 +215,8 @@ b.VALUE_IN_RANGE(<span class='val'>val</span>);
 
   <pre>  <span class='comment'>// DRAW A SHAPE</span>
   b.LINE_WIDTH(2);
-  b.STROKE_STYLE('#fbfa');
-  b.FILL_STYLE('#fcf5');
+  b.STROKE_STYLE('<span style='padding: 0.15em; font-weight: bold; color: #fbf; background-color: #ffff;'>#FBF</span>');
+  b.FILL_STYLE('<span style='padding: 0.15em; font-weight: bold; color: #fcf; background-color: #ffff;'>#FCF</span>');
   b.SHAPE([
     {'x':1,'y':8},
     {'x':2,'y':10},
@@ -227,7 +229,7 @@ b.VALUE_IN_RANGE(<span class='val'>val</span>);
     'val':{'x':0,'y':0},
     'r':3,
     'line_width':2,
-    'stroke_style':'#58da',
+    'stroke_style':'<span style='padding: 0.15em; font-weight: bold; color: #58d; background-color: #ffff;'>#58D</span>',
     'fill_style':null
   });</pre>
 
@@ -235,7 +237,12 @@ b.VALUE_IN_RANGE(<span class='val'>val</span>);
 
 <div class='box margin padding' id='container_basic'></div>
 
-</div> <!-- closing basic -->  <div class='section border margin padding'>
+</div> <!-- closing basic -->  
+  
+  
+  
+  
+  <div class='section border margin padding'>
   
   <div class='box margin padding'>
 
@@ -328,7 +335,65 @@ b.VALUE_IN_RANGE(<span class='val'>val</span>);
   
 <div class='box margin padding' id='container_special'></div>
 
-</div> <!-- closing gear -->  <div class='section border margin padding'>
+</div> <!-- closing gear -->  <div class='section border margin padding' id='section_histogram'> <!-- opening section_histogram -->
+
+
+  <div class='box'> <!-- minimum example -->
+ 
+  <div class='section'>
+  <pre class='code'>
+  (function() {
+  
+    window.addEventListener('load', function() {
+
+      let arr_x = [];
+      for (let i = 0; i &lt; 10000; i++) {
+        arr_x.push(chisq(5));  
+      }
+
+      let hist_x = new Histogram({'arr':arr_x});
+      container_histogram.appendChild(hist_x.RETURN_CANVAS());
+
+    }); <span class='comment'>// CLOSING window.onload</span>
+
+  })(); <span class='comment'>// CLOSING anon</span></pre></div>
+  
+  <div class='box margin padding' id='container_histogram_minimum'></div>
+  
+  </div>
+  
+  
+  <div class='box'> <!-- with options -->
+ 
+  <div class='section'>
+  <pre class='code'>
+  (function() {
+  
+    window.addEventListener('load', function() {
+
+      let arr_x = [];
+      for (let i = 0; i &lt; 10000; i++) {
+        arr_x.push(chisq(5));  
+      }
+
+      let hist_x = new Histogram({'arr':arr_x,'number_of_bins':23});
+      container_histogram.appendChild(hist_x.RETURN_CANVAS());
+
+    }); <span class='comment'>// CLOSING window.onload</span>
+
+  })(); <span class='comment'>// CLOSING anon</span></pre></div>
+  
+  <div class='box margin padding' id='container_histogram_options'></div>
+  
+  </div>
+  
+  
+  
+  <script src='./setup_histogram.js'></script>
+
+</div> <!-- closing section_histogram -->
+
+  <div class='section border margin padding'>
 
 <div class='box margin padding'>
 
