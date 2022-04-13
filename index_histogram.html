@@ -1,0 +1,58 @@
+<div class='section border margin padding' id='section_histogram'> <!-- opening section_histogram -->
+
+
+  <div class='box'> <!-- minimum example -->
+ 
+  <div class='section'>
+  <pre class='code'>
+  (function() {
+  
+    window.addEventListener('load', function() {
+
+      let arr_x = [];
+      for (let i = 0; i &lt; 10000; i++) {
+        arr_x.push(chisq(5));  
+      }
+
+      let hist_x = new Histogram({'arr':arr_x});
+      container_histogram.appendChild(hist_x.RETURN_CANVAS());
+
+    }); <span class='comment'>// CLOSING window.onload</span>
+
+  })(); <span class='comment'>// CLOSING anon</span></pre></div>
+  
+  <div class='box margin padding' id='container_histogram_minimum'></div>
+  
+  </div>
+  
+  
+  <div class='box'> <!-- with options -->
+ 
+  <div class='section'>
+  <pre class='code'>
+  (function() {
+  
+    window.addEventListener('load', function() {
+
+      let arr_x = [];
+      for (let i = 0; i &lt; 10000; i++) {
+        arr_x.push(chisq(5));  
+      }
+
+      let hist_x = new Histogram({'arr':arr_x,'number_of_bins':23});
+      container_histogram.appendChild(hist_x.RETURN_CANVAS());
+
+    }); <span class='comment'>// CLOSING window.onload</span>
+
+  })(); <span class='comment'>// CLOSING anon</span></pre></div>
+  
+  <div class='box margin padding' id='container_histogram_options'></div>
+  
+  </div>
+  
+  
+  
+  <script src='./setup_histogram.js'></script>
+
+</div> <!-- closing section_histogram -->
+
