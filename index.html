@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,33 +7,53 @@
 
   <title> BOX </title>
   
-  <link rel="icon" href="./include/a.png">
-  <link rel="stylesheet" href="./include/a.css">
-  <script src="./include/a.js"></script>
+  <link rel="icon" href="./includes/a.png">
+  <link rel="stylesheet" href="./includes/a.css">
+  <script src="./includes/a.js"></script>
   
-  <script src='./include/Box.js'></script>
+  <script src='./includes/Box.js'></script>
 
   <script src='./setup_basic.js'></script>
   <script src='./setup_ces_idc.js'></script>
   <script src='./setup_gear.js'></script>
 
-  <script src="./katex/katex.min.js"></script>
-  <link rel="stylesheet" href="./katex/katex.min.css" >
+  <script src="./includes/katex/katex.min.js"></script>
+  <link rel="stylesheet" href="./includes/katex/katex.min.css" >
 
 </head>
 
+
 <body>
 
-
   <div class='section border margin padding'>
+
+<div class='section border margin padding'>
+
+  <div class='margin blue'> high-level </div>
+  
+  <p> i start with <span class='inline-code'>let box = new Box();</span></p>
+
+  <p> then <span class='inline-code'>box.RETURN_CONTAINER()</span> returns a <span class='inline-code'>div element</span> with <span class='inline-code'>position:relative</span>, and it has 2 kinds of children elements : </p>
+
+<ul>
+  <li>
+    <p> the <span class='inline-code'>canvas element</span>, which is <span class='inline-code'>position:absolute; top:0; left:0;</span>. it is saved as <span class='inline-code'>box.c</span>. i can access it directly thru <span class='inline-code'>box.RETURN_CANVAS()</span></p>
+
+  <li>
+    <p> the <span class='inline-code'>TextBox.el</span> elements are <span class='inline-code'>position:absolute</span> </p>
+    <p> their <span class='inline-code'>top-left</span> combo will vary depending on : <span class='inline-code'>TextBox.x</span>, <span class='inline-code'>TextBox.y</span>, <span class='inline-code'>TextBox.alignment</span></p>
+</ul>
+
+<p> I am using <span class='inline-code'>el.getBoundingClientRect()</span> to fix positions </p>
+
+</div>
 
 <div class='box margin padding'>
 
 <pre>
   <span class='comment'>// SETUP </span>
-  let b = new Box();
-  let c = b.RETURN_CANVAS();
-  container.appendChild(c);
+  let box = new Box();
+  container.appendChild(box.RETURN_CONTAINER());
 
   <span class='comment'>// THIS IS THE NUMBER OF PIXELS</span>
   b.CANVAS_SIZE(500, 500);
@@ -395,34 +414,153 @@ b.VALUE_IN_RANGE(<span class='val'>val</span>);
 
   <div class='section border margin padding'>
 
+  <div class='margin blue'> adding text </div>
+
+  <div class='section margin'>
+
+    <ul>
+      <li><p> there is a <span class='inline-code'>TextBox</span> object </p>
+      
+      
+      <li><p> the <span class='inline-code'>TextBox.el</span> is the displayed element, and it has <span class='inline-code'>position:absolute</span> (relative to the parent container) </p>
+
+
+      <li><p> Ive made a new parent div : <span class='inline-code'>Box.container</span> is a div with <span class='inline-code'>position:relative</span>. It has children elements : </p>
+        <ul>
+          <li><p> the canvas (<span class='inline-code'>Box.c</span>) which will be <span class='inline-code'>position:absolute; top:0; left:0;</span> </p>
+          <li><p> the TextBox.el elements, which will be <span class='inline-code'>position:absolute</span>, and whose <span class='inline-code'>top-left</span> combo will vary depending on : <span class='inline-code'>TextBox.x</span>, <span class='inline-code'>TextBox.y</span>, <span class='inline-code'>TextBox.alignment</span></p>
+          <li><p> am using <span class='inline-code'>el.getBoundingClientRect()</span> to fix positions </p>
+        </ul>
+    </ul>
+
+  
+
+
+  
+  <div class='box border margin padding'>
+  <pre class='code'>
+  let box = new Box();
+  container_TextBox.appendChild(box.RETURN_CONTAINER());
+    
+  let el = new TextBox({
+    'str':'8',
+    'x':0,
+    'y':8,
+    'alignment':'center-right'
+  });
+  box.ADD_TEXT(el);</pre>
+
+  </div>
+
+  
+  <div class='box' id='container_TextBox'></div>
+  
+</div>
+
+<script>
+
+(function() {
+
+  let box;
+  window.addEventListener('load', function() {
+
+    box = new Box();
+    container_TextBox.appendChild(box.RETURN_CONTAINER());
+
+    box.CANVAS_SIZE(400, 400);
+    box.RANGE_X(-2, 10);          
+    box.RANGE_Y(-2, 10);
+
+    box.CLEAR_CANVAS();
+
+    // GRIDLINES 
+    box.LINE_WIDTH(1);
+    box.STROKE_STYLE('#ddd');
+    box.SHOW_GRID_X();
+    box.SHOW_GRID_Y();
+
+    // AXES 
+    box.LINE_WIDTH(2);
+    box.STROKE_STYLE('#999');
+    box.SHOW_AXES();
+    
+    // CONNECT POINTS
+    box.LINE_WIDTH(3);
+    box.STROKE_STYLE('#58Da');
+    box.CONNECT_POINTS([
+      {'x':0,'y':8},
+      {'x':7,'y':0}
+    ]);
+
+    let el = new TextBox({
+      'str':'8',
+      'x':0,
+      'y':8,
+      'alignment':'center-right'
+    });
+    box.ADD_TEXT(el);
+
+    let el2 = new TextBox({
+      'str':'7',
+      'x':7,
+      'y':0,
+      'alignment':'top-center'
+    });
+    box.ADD_TEXT(el2);
+
+    let el3 = new TextBox({
+      'str':'top-right',
+      'x':10,
+      'y':10,
+      'alignment':'top-right'
+    });
+    box.ADD_TEXT(el3);
+    box.FILL_STYLE('#FC0');
+    box.RADIUS(4);
+    box.POINT({'x':10,'y':10});
+
+    let el4 = new TextBox({
+      "str":"<div><span class='math'>L=n+b</span></div><div><span class='math'>wL=w(n-b), wL=wn-wb, wL=y-wb</span></div>",
+      'x':5,
+      'y':5,
+      'alignment':'top-right'
+    });
+    box.ADD_TEXT(el4);
+    
+  }); // CLOSING window.onload 
+
+})(); // CLOSING anon
+
+</script>
+  <div class='section border margin padding'>
+
 <div class='box margin padding'>
 
 <pre>
 (function() {
 
-  let b, c;
+  let box;
   window.addEventListener('load', function() {
 
-    b = new Box();
-    c = b.RETURN_CANVAS();
-    container.appendChild(c);
+    box = new Box();
+    container.appendChild(box.RETURN_CONTAINER());
 
-    b.CANVAS_SIZE(500, 500);
-    b.RANGE_X(-1, 11);          
-    b.RANGE_Y(-1, 11);
+    box.CANVAS_SIZE(500, 500);
+    box.RANGE_X(-1, 11);          
+    box.RANGE_Y(-1, 11);
 
-    b.CLEAR_CANVAS();
+    box.CLEAR_CANVAS();
 
     // GRIDLINES 
-    b.LINE_WIDTH(1);
-    b.STROKE_STYLE('#ddd');
-    b.SHOW_GRID_X();
-    b.SHOW_GRID_Y();
+    box.LINE_WIDTH(1);
+    box.STROKE_STYLE('#ddd');
+    box.SHOW_GRID_X();
+    box.SHOW_GRID_Y();
 
     // AXES 
-    b.LINE_WIDTH(2);
-    b.STROKE_STYLE('#999');
-    b.SHOW_AXES();
+    box.LINE_WIDTH(2);
+    box.STROKE_STYLE('#999');
+    box.SHOW_AXES();
   
   }); <span class='comment'>// CLOSING window.onload </span>
 
