@@ -1,4 +1,4 @@
-/* LAST UPDATED : 2022-06-14-1147 EDT */
+/* LAST UPDATED : 2022-07-04-0350 EDT */
 
 /*
 
@@ -19,7 +19,8 @@ function Box() {
 
   this.container = document.createElement('div');
   this.container.style.position = 'relative';
-  this.container.appendChild(this.c); 
+  this.container.style.border = '1px solid #999';
+  this.container.appendChild(this.c);
   
   this.data = {
     'dimension':{
@@ -597,6 +598,60 @@ Box.prototype.VALUE_IN_RANGE = function(val) {
   }
 
 }
+
+Box.prototype.ARROW = function(obj) {
+  
+  /*
+    obj = {
+      'arr':[val_a,val_b],
+      'line_width':2,
+      'stroke_style':'000'
+    }
+  */
+  
+  let p0 = this.VALUE2PIXEL(obj.arr[0]);
+  let p1 = this.VALUE2PIXEL(obj.arr[1]);
+
+  this.ctx.lineWidth = obj.line_width;
+  this.ctx.strokeStyle = obj.stroke_style;
+
+  this.ctx.beginPath();
+  this.ctx.moveTo(p0.x, p0.y);
+  this.ctx.lineTo(p1.x, p1.y);
+  this.ctx.stroke();
+  
+  // slope of the vector
+  let m = (p1.y - p0.y)/(p1.x - p0.x);
+  
+  let arrow_height = 14;
+  let arrow_base = arrow_height*0.6;
+  
+  let dx = arrow_height/(1+m**2)**0.5;
+  let dy = m*dx;
+  
+  let m_inv = -1/m;
+  
+  let a0 = {'x':(p1.x-dx),'y':(p1.y-dy)};
+  
+  let dx_base = (arrow_base*0.5)/(1+m_inv**2)**0.5;
+  let dy_base = m_inv*dx_base;
+  
+  let a1 = {'x':(a0.x-dx_base),'y':(a0.y-dy_base)};
+  let a2 = {'x':(a0.x+dx_base),'y':(a0.y+dy_base)};
+  
+  this.ctx.fillStyle = '#fff0'; //this.ctx.strokeStyle;
+  // this.ctx.fillStyle = this.ctx.strokeStyle;
+  
+  this.ctx.beginPath();
+  this.ctx.moveTo(p1.x, p1.y);
+  this.ctx.lineTo(a1.x, a1.y);
+  this.ctx.lineTo(a2.x, a2.y);
+  this.ctx.lineTo(p1.x, p1.y);
+  this.ctx.stroke();
+  this.ctx.fill();
+  
+}
+
 
 Box.prototype.CIRCLE = function(obj) {
 
@@ -1952,20 +2007,67 @@ Box.prototype.SHOW_CES_INDIFFERENCE_CURVE = function(obj) {
 }
 
 
-function rnorm() {
- let u = 0, v = 0;
- while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
- while(v === 0) v = Math.random();
- return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+
+
+
+Box.prototype.rnorm = function() {
+  let u = 0, v = 0;
+  while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+  while(v === 0) v = Math.random();
+  return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
 };
+
 // takes one argument: df[required]
-function chisq(df) {
+Box.prototype.chisq = function(df) {
   let w = 0;
   for (let i = 0; i < df; i++) {
-    w += Math.pow(rnorm(), 2);
+    w += Math.pow(this.rnorm(), 2);
   }
   return w;
 };
+
+// takes one argument: df[required]
+Box.prototype.fact = function(n) {
+  if (n === 0) {
+    return 1;
+  }
+  return n*this.fact(n-1);
+};
+
+Box.prototype.sum = function(arr) {
+  let a = 0;
+  for (let i = 0; i < arr.length; i++) {
+  a += arr[i];
+  }
+  return a;
+};
+Box.prototype.count = function(arr) {
+  return arr.length;
+};
+Box.prototype.mean = function(arr) {
+  return this.sum(arr) / this.count(arr);
+};
+Box.prototype.variance = function(arr) {
+  let mean = this.mean(arr);
+  let a = 0;
+  for (let i = 0; i < arr.length; i++) {
+  a += Math.pow((arr[i] - mean), 2);
+  }
+  return a / arr.length;
+};
+Box.prototype.covariance = function(arr1, arr2) {
+  let mean1 = this.mean(arr1);
+  let mean2 = this.mean(arr2);
+
+  let a = 0;
+  for (let i = 0; i < arr1.length; i++) {
+  a += (arr1[i] - mean1) * (arr2[i] - mean2);
+  }
+  return a / arr1.length;      
+};
+
+        
+        
 
 
   let raf = (function() {
