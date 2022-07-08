@@ -1,4 +1,4 @@
-/* LAST UPDATED : 2022-07-04-0350 EDT */
+/* LAST UPDATED : 2022-07-08-0957 EDT */
 
 /*
 
@@ -1842,6 +1842,8 @@ Box.prototype.SHOW_CES_INDIFFERENCE_CURVE = function(obj) {
   
   // I CAN ACTUALLY SET DELTA = -INFINITY HERE, SO I SHOULD DO THAT, IF DELTA IS BIG ENOUGH
   
+
+  
   
   let output = {
     'delta':null,
@@ -1947,7 +1949,16 @@ Box.prototype.SHOW_CES_INDIFFERENCE_CURVE = function(obj) {
     arr.sort(function(a,b) {
       return a.x - b.x;
     }); 
-
+    
+    // IF YOU ARE DOING AN EDGEWORTH BOX, YOU MIGHT WANT THE IDC TO BE INVERTED
+    if (obj.hasOwnProperty('inverted')) {
+      if (obj.inverted) {
+        for (let i = 0; i < arr.length; i++) {
+          arr[i].x = (this.data.range.x.max - arr[i].x);
+          arr[i].y = (this.data.range.y.max - arr[i].y);
+        }
+      }
+    }
     
     this.CONNECT_VALUES(arr);
     return output;
@@ -1998,6 +2009,18 @@ Box.prototype.SHOW_CES_INDIFFERENCE_CURVE = function(obj) {
   arr.sort(function(a,b) {
     return a.x - b.x;
   });
+  
+  
+  // IF YOU ARE DOING AN EDGEWORTH BOX, YOU MIGHT WANT THE IDC TO BE INVERTED
+  if (obj.hasOwnProperty('inverted')) {
+    if (obj.inverted) {
+      for (let i = 0; i < arr.length; i++) {
+        arr[i].x = (this.data.range.x.max - arr[i].x);
+        arr[i].y = (this.data.range.y.max - arr[i].y);
+      }
+    }
+  }
+
   // console.log(arr);
   // once its sorted, it might make sense to do a while loop to remove the points at the beginning and end that are not on the grid
   
