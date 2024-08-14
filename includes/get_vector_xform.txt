@@ -1,0 +1,54 @@
+
+rcot.get_vector_transform = function(vector_, xform_) {
+
+  let n_rows = vector_.length;
+  let output_vector = [];
+  for (let y = 0; y < n_rows; y++) {
+    output_vector = [ vector_[y][0] ];
+  } // closing y-loop
+  
+  if (xform_ == "log") {
+    for (let y = 0; y < n_rows; y++) {
+      output_vector = [ Math.log(vector_[y][0]) ];
+    } // closing y-loop
+  }
+  
+  return output_vector;
+
+}; // closing get vector xform
+
+rcot.LN = function(vector_) {
+
+  let n_rows = vector_.length;
+  let output_vector = [];
+  for (let y = 0; y < n_rows; y++) {
+    output_vector[y] = [ Math.log(vector_[y][0]) ];
+  } // closing y-loop
+
+  return output_vector;
+
+}; // closing get vector xform
+
+rcot.SQ = function(vector_) {
+
+  let n_rows = vector_.length;
+  let output_vector = [];
+  for (let y = 0; y < n_rows; y++) {
+    output_vector[y] = [ (vector_[y][0])**2 ];
+  } // closing y-loop
+
+  return output_vector;
+
+}; // closing get vector xform
+
+rcot.SQRT = function(vector_) {
+
+  let n_rows = vector_.length;
+  let output_vector = [];
+  for (let y = 0; y < n_rows; y++) {
+    output_vector[y] = [ (vector_[y][0])**(0.5) ];
+  } // closing y-loop
+
+  return output_vector;
+
+}; // closing get vector xform

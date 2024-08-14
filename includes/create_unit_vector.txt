@@ -1,0 +1,28 @@
+
+rcot.create_unit_vector = function(n_rows) {
+
+  let output_matrix = [];
+
+  for (let y = 0; y < n_rows; y++) {
+  
+    output_matrix.push([1]);
+
+  } // closing y-loop
+  
+  return output_matrix;
+  
+};  // closing create_unit_vector
+
+rcot.create_zero_vector = function(n_rows) {
+
+  let output_matrix = [];
+
+  for (let y = 0; y < n_rows; y++) {
+  
+    output_matrix.push([0]);
+
+  } // closing y-loop
+  
+  return output_matrix;
+  
+};  // closing create_zero_vector

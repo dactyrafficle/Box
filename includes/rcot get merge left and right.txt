@@ -1,0 +1,92 @@
+
+// add this one
+
+rcot.JOIN_ON_X = function(vectors_) {
+
+  // accepts an array of vectors
+  
+  let matrices = [];
+  for (let i = 0; i < vectors_.length; i++) {
+    let matrix = this.get_clone(vectors_[i]);
+    matrices.push(matrix);
+  }
+  
+  let n_rows = matrices[0].length;
+  
+  let all_matrices_the_same_length = true;
+  for (let i = 0; i < (matrices.length-1); i++) {
+    
+    if (matrices[i].length !== matrices[i+1].length) {
+      all_matrices_the_same_length = false;
+    }
+  }
+
+  let output_matrix = [];
+  for (let y = 0; y < n_rows; y++) {
+    output_matrix.push([]);
+  }
+
+  for (let i = 0; i < matrices.length; i++) {
+    let matrix = matrices[i];
+    let n_cols = matrix[0].length;
+    
+    for (let y = 0; y < n_rows; y++) {
+      
+      for (let x = 0; x < n_cols; x++) {
+        
+        output_matrix[y].push( matrix[y][x] );
+        
+      } // closing x-loop
+
+    } // closing y-loop
+
+  } // closing i-loop
+  
+  return output_matrix;
+
+};
+
+
+// update this one
+rcot.get_merge_left_right = function(matrix_a__, matrix_b__) {
+
+  let matrices = [];
+  for (let i = 0; i < arguments.length; i++) {
+    let matrix = this.get_clone(arguments[i]);
+    matrices.push(matrix);
+  }
+  
+  let n_rows = matrices[0].length;
+  
+  let all_matrices_the_same_length = true;
+  for (let i = 0; i < (matrices.length-1); i++) {
+    
+    if (matrices[i].length !== matrices[i+1].length) {
+      all_matrices_the_same_length = false;
+    }
+  }
+
+  let output_matrix = [];
+  for (let y = 0; y < n_rows; y++) {
+    output_matrix.push([]);
+  }
+
+  for (let i = 0; i < matrices.length; i++) {
+    let matrix = matrices[i];
+    let n_cols = matrix[0].length;
+    
+    for (let y = 0; y < n_rows; y++) {
+      
+      for (let x = 0; x < n_cols; x++) {
+        
+        output_matrix[y].push( matrix[y][x] );
+        
+      } // closing x-loop
+
+    } // closing y-loop
+
+  } // closing i-loop
+  
+  return output_matrix;
+
+};

@@ -1,0 +1,25 @@
+
+rcot
+
+
+function get_min(vec_) {
+  let min_ = 99999999;
+  for (let i = 0; i < vec_.length; i++) {
+    if (vec_[i][0] < min_) {
+      min_ = vec_[i][0];
+    }
+  }; // closing i-loop
+  return min_;
+};
+
+function get_max(vec_) {
+  let max_ = -99999999;
+  for (let i = 0; i < vec_.length; i++) {
+    if (vec_[i][0] > max_) {
+      max_ = vec_[i][0];
+    }
+  }; // closing i-loop
+  return max_;
+};
+
+

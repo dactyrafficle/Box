@@ -1,0 +1,18 @@
+
+
+p2 is anchored to p1 at a distance of r
+
+
+* p1 changes position
+
+* recalculate the vector between p1 and p2, A
+
+* reposition p2 along the new vector A, at a distance of r
+
+* from the total forces accumulated on p2, take the component perpendicular to A
+
+* this perpendicular force exerts angular acceleration, imposing an angular velocity, and changing the angle between p1 and p2
+
+* calculate the new angle theta between p1 and p2
+
+* calculate the new position of p2
